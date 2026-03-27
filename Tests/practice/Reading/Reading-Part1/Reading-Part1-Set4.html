@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading — Part 1 | Set 3 | IELTSPRACTICE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            line-height: 1.4;
+            font-size: 16px;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background-color: #ffffff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            height: 60px;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 14px; }
+
+        .ielts-logo {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #1a1a2e;
+            text-decoration: none;
+            gap: 6px;
+        }
+        .ielts-logo-badge {
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .header-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            border-left: 1px solid #ddd;
+            padding-left: 14px;
+        }
+
+        .back-btn {
+            background: none;
+            border: 1.5px solid #ccc;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .back-btn:hover { background: #f5f5f5; border-color: #999; }
+
+        /* Exam mode badge */
+        .exam-mode-badge {
+            display: none;
+            background: #dc3545;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 99px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        body.exam-mode .exam-mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        body.exam-mode .exam-mode-badge::before {
+            content: '';
+            display: inline-block;
+            width: 7px; height: 7px;
+            background: #fff;
+            border-radius: 50%;
+            animation: blink 1.2s infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+        body.exam-mode #timer-toggle-btn,
+        body.exam-mode #timer-reset-btn { display: none !important; }
+
+        /* Timer */
+        .timer-container {
+            display: flex;
+            position: relative;
+            cursor: default;
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            align-items: center;
+        }
+        .timer-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 15px;
+        }
+        .timer-controls button {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            padding: 0;
+            cursor: pointer;
+            width: 32px; height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        .timer-controls button:hover { background: #e0e0e0; }
+        .timer-controls button svg { width: 20px; height: 20px; fill: #333; }
+        body.exam-mode .timer-display.urgent { color: #dc3545; font-weight: 700; }
+
+        /* ── MAIN LAYOUT ── */
+        .main-container {
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            height: calc(100vh - 60px);
+            position: relative;
+        }
+
+        .part-header {
+            background-color: #f1f2ec;
+            padding: 15px 20px;
+            border: 1px solid #e0e0e0;
+            text-align: left;
+            margin: 10px 20px;
+            border-radius: 5px;
+        }
+        .part-header p { margin: 0; }
+        .part-header p:first-child { margin-bottom: 5px; }
+
+        .panels-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Passage panel */
+        .passage-panel {
+            flex: 1;
+            padding: 20px 20px 100px;
+            overflow-y: auto;
+            min-width: 200px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .passage-panel::-webkit-scrollbar { width: 8px; background: transparent; }
+        .passage-panel::-webkit-scrollbar-track { background: transparent; }
+        .passage-panel::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+
+        /* Resizer */
+        .resizer {
+            position: relative;
+            background: transparent;
+            cursor: col-resize;
+            flex-shrink: 0;
+            flex-grow: 0;
+            z-index: 5;
+            width: 16px;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .resizer::before {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            left: 50%;
+            width: 3px;
+            transform: translateX(-50%);
+            background-color: #3e3e3e;
+        }
+        .resizer::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 36px; height: 36px;
+            background-color: #ffffff;
+            border: 2px solid #3e3e3e;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="%233e3e3e" fill="%233e3e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><line x1="4" y1="12" x2="20" y2="12"/></svg>');
+            background-repeat: no-repeat;
+            background-size: 60% 60%;
+            background-position: center;
+            pointer-events: none;
+        }
+
+        /* Questions panel */
+        .questions-panel {
+            flex: 1;
+            padding: 20px 20px 100px;
+            overflow-y: auto;
+            min-width: 200px;
+            border-left: 1px solid #e0e0e0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .questions-panel::-webkit-scrollbar { width: 8px; background: transparent; }
+        .questions-panel::-webkit-scrollbar-track { background: transparent; }
+        .questions-panel::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+
+        /* ── PASSAGE TYPOGRAPHY ── */
+        .text-center { text-align: center; }
+        .reading-passage h4 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .reading-passage p { margin-bottom: 1.2em; }
+
+        /* ── QUESTION STYLES ── */
+        .question { margin-bottom: 40px; }
+        .question p { margin-bottom: 10px; }
+        .question-prompt { margin-bottom: 20px; }
+        .question ul { list-style: none; padding-left: 0; }
+        .question ul li { margin-bottom: 5px; }
+        .question ul li label { display: block; margin-top: 8px; cursor: pointer; }
+
+        /* Drop zones */
+        .drop-zone {
+            border: 2px dashed #aaa;
+            border-radius: 4px;
+            width: auto;
+            margin-top: 0;
+            margin-bottom: 10px;
+            transition: background-color 0.2s, border-color 0.2s;
+            padding: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            min-height: 34px;
+            background-color: #f9f9f9;
+            color: #aaa;
+            font-weight: bold;
+        }
+        .drop-zone.drag-over { background-color: #e6f4ff; border-color: #4a90e2; }
+        .drop-zone.correct { background-color: #e9f7ef; border-color: #28a745; border-style: solid; }
+        .drop-zone.incorrect { background-color: #f8d7da; border-color: #dc3545; border-style: solid; }
+        .drop-zone.disabled { pointer-events: none; }
+        .drop-zone.filled {
+            background-color: transparent;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            padding: 0;
+        }
+        .drop-zone.filled .drag-item {
+            border: 2px solid #4a90e2;
+            border-radius: 10px;
+            padding: 4px 10px 4px 36px;
+            font-weight: 700;
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(74,144,226,0.15);
+            cursor: default;
+            white-space: nowrap;
+            position: relative;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+        }
+        .drop-zone.filled .drag-item::before {
+            content: attr(data-value);
+            position: absolute;
+            left: 8px; top: 50%;
+            transform: translateY(-50%);
+            width: 20px; height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            color: #4a90e2;
+            background: #ffffff;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .drop-zone.filled .drag-item strong { display: none; }
+
+        /* Drag items */
+        .drag-item {
+            background: white;
+            border: 1px solid #9c9c9c;
+            font-weight: 600;
+            padding: 0px 5px;
+            border-radius: 4px;
+            cursor: move;
+            font-size: 16px;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .drag-item:hover { background: #e9ecef; }
+        .drag-item.dragging { opacity: 0.5; }
+        .drag-item.selected { border-color: #4a90e2; box-shadow: 0 0 0 2px rgba(74,144,226,0.5); }
+
+        .drag-drop-container { display: flex; gap: 30px; margin-top: 20px; align-items: flex-start; }
+        .recommendations-box { display: flex; flex-direction: column; gap: 8px; min-height: 200px; }
+
+        /* TRUE/FALSE/YES/NO questions */
+        .tf-question {
+            margin-bottom: 25px;
+            padding: 10px 0;
+            border-radius: 4px;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        .tf-question-line {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 5px 0;
+            border-radius: 4px;
+        }
+        .tf-question-number {
+            border: 2px solid #ccc;
+            padding: 2px 8px;
+            margin-right: 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            transition: border-color 0.3s;
+            display: inline-block;
+        }
+        .tf-question.active-question .tf-question-number { border-color: #4a90e2; }
+        .tf-question-text { padding-top: 3px; }
+        .tf-options { padding-left: 5px; }
+        .tf-option {
+            display: flex;
+            cursor: pointer;
+            align-items: center;
+            padding: 10px 12px;
+            transition: background-color 0.2s, border-color 0.2s;
+            background-color: #fff;
+        }
+        .tf-option:hover { background-color: #f1f7ff; }
+        .tf-option:has(input[type="radio"]:checked) { background-color: #cfe3f9; }
+        .tf-option.correct { background-color: #d4edda !important; border-color: #28a745 !important; }
+        .tf-option.incorrect { background-color: #f8d7da !important; border-color: #dc3545 !important; }
+        .tf-option.correct-answer-highlight { background-color: #d4edda !important; border-color: #28a745 !important; }
+        body.results-mode .tf-option:has(input[type="radio"]:checked) { box-shadow: none; }
+        .tf-option input[type="radio"] { margin-right: 10px; transform: scale(1.2); }
+        .tf-question.correct .tf-question-line { background-color: #e9f7ef; }
+        .tf-question.incorrect .tf-question-line { background-color: #f8d7da; }
+
+        /* Correct/incorrect answer display */
+        .correct-answer-display { font-weight: bold; color: #28a745; margin-left: 10px; font-size: 14px; }
+
+        /* ── CONTEXT MENU ── */
+        .context-menu {
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: none;
+            min-width: 140px;
+        }
+        .context-menu-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .context-menu-item:hover { background-color: #f8f9fa; }
+        .context-menu-item:last-child { border-bottom: none; }
+
+        /* Highlights */
+        .highlight { background-color: #ffff00; }
+        .comment-highlight { background-color: #90EE90; position: relative; cursor: help; }
+        .comment-tooltip {
+            position: absolute;
+            bottom: 100%; left: 50%;
+            transform: translateX(-50%);
+            background: #333; color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            white-space: nowrap;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .comment-highlight:hover .comment-tooltip { opacity: 1; }
+
+        /* ── BOTTOM NAV ROW ── */
+        .nav-row {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #ffffff;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            height: 80px;
+            z-index: 100;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .nav-questions-strip {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 0 16px;
+            flex: 1;
+            overflow-x: auto;
+        }
+
+        .subQuestion {
+            width: 32px; height: 32px;
+            border: 1px solid #ccc;
+            background: white;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        .subQuestion.answered { background-color: #e9ecef; border-color: #ddd; }
+        .subQuestion.correct { background-color: #28a745; color: white; border-color: #28a745; }
+        .subQuestion.incorrect { background-color: #dc3545; color: white; border-color: #dc3545; }
+        .subQuestion:hover { background-color: #f0f0f0; border-color: #999; }
+        .subQuestion.active { background-color: #4a90e2; color: white; border-color: #4a90e2; }
+
+        .footer__deliverButton___3FM07 {
+            margin-left: auto;
+            margin-right: 20px;
+            background-color: #f3f4f6;
+            color: #111827;
+            border: 1px solid #d1d5db;
+            padding: 10px 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.08s ease, background-color 0.2s ease;
+            min-width: 160px;
+            justify-content: center;
+        }
+        .footer__deliverButton___3FM07:hover { background-color: #ebedf0; border-color: #c7ccd4; }
+        .footer__deliverButton___3FM07:active { transform: translateY(1px); }
+
+        /* Nav arrows */
+        .nav-arrows {
+            position: fixed;
+            bottom: 100px; right: 20px;
+            display: flex;
+            gap: 6px;
+            z-index: 101;
+        }
+        .nav-arrow {
+            width: 48px; height: 48px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+            outline: none;
+        }
+        .nav-arrow.prev { background-color: #4b5563; }
+        .nav-arrow.next { background-color: #000000; }
+        .nav-arrow:hover { transform: translateY(-1px); }
+        .nav-arrow:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── RESULTS MODAL ── */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(17,24,39,0.6);
+            backdrop-filter: blur(3px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.hidden { display: none; }
+        .modal-content {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 14px;
+            width: 92%;
+            max-width: 780px;
+            max-height: 86vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+        .modal-close-btn {
+            position: absolute; top: 10px; right: 15px;
+            background: none; border: none;
+            font-size: 28px; cursor: pointer; color: #666;
+        }
+        .modal-content h2 { text-align: center; margin-bottom: 18px; color: #111827; }
+        .results-summary {
+            display: flex; gap: 12px;
+            justify-content: center;
+            margin-bottom: 16px;
+            text-align: center;
+            border-bottom: 1px solid #eef2f7;
+            padding-bottom: 12px;
+        }
+        .results-summary p { margin: 0; font-size: 14px; color: #374151; }
+        .results-summary p span {
+            display: inline-block;
+            padding: 4px 10px; margin-left: 6px;
+            border-radius: 999px;
+            background: #f3f4f6;
+            font-weight: 700; color: #111827;
+        }
+        .results-details-container { overflow-y: auto; padding-right: 10px; border-radius: 8px; }
+        .result-row {
+            display: grid;
+            grid-template-columns: 56px 1fr 1fr;
+            gap: 12px;
+            padding: 10px 8px;
+            border-bottom: 1px solid #eef2f7;
+            font-size: 15px;
+            align-items: center;
+        }
+        .result-row.correct { background-color: #f3faf5; }
+        .result-row.incorrect { background-color: #fff5f5; }
+        .result-row .q-num {
+            font-weight: 700; color: #111827;
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            width: 42px; height: 30px;
+            display: inline-flex;
+            align-items: center; justify-content: center;
+        }
+        .result-row .user-ans {
+            color: #374151; background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 4px 8px; border-radius: 6px;
+        }
+        .result-row .correct-ans {
+            color: #065f46; font-weight: 600;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            padding: 4px 8px; border-radius: 6px;
+        }
+
+        /* ── PRE-TEST MODAL ── */
+        .pretest-overlay {
+            position: fixed; inset: 0;
+            background: rgba(15,15,30,0.75);
+            z-index: 3000;
+            display: flex;
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(3px);
+        }
+        .pretest-modal {
+            background: #fff;
+            border-radius: 12px;
+            padding: 40px 36px 32px;
+            max-width: 480px; width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+        .pretest-modal .modal-logo {
+            font-size: 15px; font-weight: 800;
+            letter-spacing: 1.5px; color: #1a1a2e;
+            margin-bottom: 24px;
+        }
+        .pretest-modal .modal-logo span {
+            background: #1a1a2e; color: #fff;
+            padding: 2px 6px; border-radius: 4px;
+            font-size: 12px;
+        }
+        .pretest-modal h2 { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; }
+        .pretest-modal p { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 28px; }
+        .pretest-modal .exam-note {
+            background: #fff8e1; border: 1px solid #ffe082;
+            border-radius: 8px; padding: 12px 14px;
+            font-size: 13px; color: #795548;
+            margin-bottom: 28px; text-align: left;
+        }
+        .pretest-modal .exam-note strong { color: #e65100; }
+        .pretest-btn-group { display: flex; gap: 12px; justify-content: center; }
+        .pretest-btn {
+            flex: 1; padding: 12px 16px;
+            border-radius: 8px; font-size: 14px;
+            font-weight: 700; cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .pretest-btn.btn-exam { background: #1a1a2e; color: #fff; }
+        .pretest-btn.btn-exam:hover { background: #2d2d4e; }
+        .pretest-btn.btn-practice { background: #fff; color: #1a1a2e; border-color: #ccc; }
+        .pretest-btn.btn-practice:hover { background: #f5f5f5; border-color: #999; }
+
+        .hidden { display: none !important; }
+        .sr-only {
+            position: absolute; width: 1px; height: 1px;
+            padding: 0; margin: -1px; overflow: hidden;
+            clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+        }
+
+        @media (max-width: 768px) {
+            .nav-row, .nav-arrows { display: none !important; }
+            .main-container { padding-bottom: 72px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Pre-Test Mode Selection Modal -->
+    <div id="pretest-overlay" class="pretest-overlay">
+        <div class="pretest-modal">
+            <div class="modal-logo">IELTS<span>PRACTICE</span></div>
+            <h2>Choose Your Test Mode</h2>
+            <p>Would you like to take this in a <strong>Real Exam Environment</strong>?</p>
+            <div class="exam-note">
+                <strong>⚠️ Real Exam Mode:</strong> The timer starts immediately and cannot be paused. The test will automatically submit when 20 minutes are up.
+            </div>
+            <div class="pretest-btn-group">
+                <button class="pretest-btn btn-exam" id="btn-exam-mode">Yes — Real Exam Mode</button>
+                <button class="pretest-btn btn-practice" id="btn-practice-mode">No — Practice Mode</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <button class="back-btn" id="back-btn" title="Go back to home">← Back</button>
+            <div class="ielts-logo">
+                <span class="ielts-logo-badge">IELTS</span>PRACTICE
+            </div>
+            <span class="header-title">Reading — Part 1 | Set 3</span>
+            <span class="exam-mode-badge" id="exam-mode-badge">Exam Mode</span>
+        </div>
+        <div class="timer-container">
+            <span class="timer-display" id="timer-display">20:00</span>
+            <div class="timer-controls">
+                <button id="timer-toggle-btn" title="Pause/Resume Timer">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M8 5v14l11-7L8 5z"/></svg>
+                </button>
+                <button id="timer-reset-btn" title="Reset Timer">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main-container" id="main-container">
+        <div id="passage-header-container">
+            <div class="part-header">
+                <p><strong>Part 1</strong></p>
+                <p>Read the text and answer questions 1–13.</p>
+            </div>
+        </div>
+
+        <div class="panels-container">
+            <!-- Passage Panel -->
+            <div class="passage-panel" id="passage-panel">
+                <div class="reading-passage">
+                    <h4 class="text-center">Food advertising on children</h4>
+                    <p style="font-style: italic; text-align: center;">This review was commissioned by the Food Standards Agency to examine the current research evidence on:</p>
+
+                    <div class="drop-zone" data-q-start="1" data-dnd-group="p1-headings" style="margin-bottom:10px;"></div>
+                    <p>Children's food promotion is dominated by television advertising, and the great majority of this promotes the so-called 'Big Four' of pre-sugared breakfast cereals, soft drinks, confectionery and savoury snacks. In the last ten years advertising for fast food outlets have rapidly increased. There is some evidence that the dominance of television has recently begun to wane. The importance of strong, global branding reinforces a need for multi-faceted communications combining television with merchandising, 'tie-ins' and point of sale activity. The advertised diet contrasts sharply with that recommended by public health advisors, and themes of fun and fantasy or taste, rather than health and nutrition, are used to promote it to children. Meanwhile, the recommended diet gets little promotional support.</p>
+
+                    <div class="drop-zone" data-q-start="2" data-dnd-group="p1-headings" style="margin-bottom:10px;"></div>
+                    <p>There is plenty of evidence that children notice and enjoy food promotion. However, establishing whether this actually influences them is a complex problem. The review tackled it by looking at studies that had examined possible effects on what children know about food, their food preferences, their actual food behaviour (both buying and eating), and their health outcomes (eg. Obesity or cholesterol levels). The majority of studies examined food advertising, but a few examined other forms of food promotion. In terms of nutritional knowledge, food advertising seems to have little influence on children's general perceptions of what constitutes a healthy diet, but, in certain contexts, it does have an effect on more specific types of nutritional knowledge. For example, seeing soft drink and cereal adverts reduced primary aged children's ability to determine correctly whether or not certain products contained real fruit.</p>
+
+                    <div class="drop-zone" data-q-start="3" data-dnd-group="p1-headings" style="margin-bottom:10px;"></div>
+                    <p>The review also found evidence that food promotion influences children's food preferences and purchase behaviour. A study of primary school children, for instance, found that exposure to advertising influenced which foods they claimed to like; and another showed that labelling and signage on a vending machine had an effect on what was bought by secondary school pupils. A number of studies have also shown that food advertising can influence what children eat. One, for example, showed that advertising influenced a primary class's choice of daily snack at playtime.</p>
+
+                    <div class="drop-zone" data-q-start="4" data-dnd-group="p1-headings" style="margin-bottom:10px;"></div>
+                    <p>The next step, of trying to establish whether or not a link exists between food promotion and diet or obesity, is extremely difficult as it requires research to be done in real-world settings. A number of studies have attempted this by using the amount of television viewing as a proxy for exposure to television advertising. They have established a clear link between television viewing and diet, obesity, and cholesterol levels. It is impossible to say, however, whether this effect is caused by the advertising, the sedentary nature of television viewing or snacking that might take place whilst viewing. One study resolved this problem by taking a detailed diary of children's viewing habits. This showed that the more food adverts they saw, the more snacks and calories they consumed.</p>
+
+                    <div class="drop-zone" data-q-start="5" data-dnd-group="p1-headings" style="margin-bottom:10px;"></div>
+                    <p>Thus the literature does suggest food promotion is influencing children's diet in a number of ways. This does not amount to proof; as noted above with this kind of research, incontrovertible proof simply isn't attainable. Nor do all studies point to this conclusion; several have not found an effect. In addition, very few studies have attempted to measure how strong these effects are relative to other factors influencing children's food choices. Nonetheless, many studies have found clear effects and they have used sophisticated methodologies that make it possible to determine that i) these effects are not just due to chance; ii) they are independent of other factors that influence diets, such as parents' eating habits or attitudes; and iii) they occur at a brand and category level.</p>
+
+                    <div class="drop-zone" data-q-start="6" data-dnd-group="p1-headings" style="margin-bottom:10px;"></div>
+                    <p>Furthermore, two factors suggest that these findings actually downplay the effect that food promotion has on children. First, the literature focuses principally on television advertising; the cumulative effect of this combined with other forms of promotion and marketing is likely to be significantly greater. Second, the studies have looked at the direct effects of individual children, and understate indirect influences. For example, promotion for fast food outlets may not only influence the child but also encourage parents to take them for meals and reinforce the idea that this is normal and desirable behaviour.</p>
+
+                    <div class="drop-zone" data-q-start="7" data-dnd-group="p1-headings" style="margin-bottom:10px;"></div>
+                    <p>This does not amount to proof of an effect, but in our view does provide sufficient evidence to conclude that an effect exists. The debate should now shift to what action is needed, and specifically to how the power of commercial marketing can be used to bring about improvements in young people's eating.</p>
+                </div>
+            </div>
+
+            <!-- Resizer -->
+            <div class="resizer" id="resizer"></div>
+
+            <!-- Questions Panel -->
+            <div class="questions-panel" id="questions-panel">
+                <div class="questions-container">
+
+                    <!-- Questions 1–7: List of Headings (Drag & Drop) -->
+                    <div class="question" data-q-start="1" data-q-end="7">
+                        <div class="question-prompt">
+                            <p><strong>Questions 1–7</strong></p>
+                            <p>The text has seven paragraphs. Choose the correct heading for each section and move it into the gap.</p>
+                            <p><strong>List of Headings</strong></p>
+                        </div>
+                        <div class="drag-drop-container">
+                            <div class="recommendations-box" id="headings-bank">
+                                <div class="drag-item" draggable="true" data-dnd-group="p1-headings" data-value="i">i. General points of agreements and disagreements of researchers</div>
+                                <div class="drag-item" draggable="true" data-dnd-group="p1-headings" data-value="ii">ii. How much children really know about food</div>
+                                <div class="drag-item" draggable="true" data-dnd-group="p1-headings" data-value="iii">iii. Need to take action</div>
+                                <div class="drag-item" draggable="true" data-dnd-group="p1-headings" data-value="iv">iv. Advertising effects of the "Big Four"</div>
+                                <div class="drag-item" draggable="true" data-dnd-group="p1-headings" data-value="v">v. Connection of advertising and children's weight problems</div>
+                                <div class="drag-item" draggable="true" data-dnd-group="p1-headings" data-value="vi">vi. Evidence that advertising affects what children buy to eat</div>
+                                <div class="drag-item" draggable="true" data-dnd-group="p1-headings" data-value="vii">vii. How parents influence children's eating habits</div>
+                                <div class="drag-item" draggable="true" data-dnd-group="p1-headings" data-value="viii">viii. Advertising's focus on unhealthy options</div>
+                                <div class="drag-item" draggable="true" data-dnd-group="p1-headings" data-value="ix">ix. Children often buy what they want</div>
+                                <div class="drag-item" draggable="true" data-dnd-group="p1-headings" data-value="x">x. Underestimating the effects advertising has on children</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Questions 8–13: YES/NO/NOT GIVEN -->
+                    <div class="question" data-q-start="8" data-q-end="13">
+                        <div class="question-prompt">
+                            <p><strong>Questions 8–13</strong></p>
+                            <p>Do the following statements agree with the views of the writer in Reading Passage 1?</p>
+                            <p><strong>YES</strong> if the statement agrees with the views of the writer</p>
+                            <p><strong>NO</strong> if the statement contradicts with the views of the writer</p>
+                            <p><strong>NOT GIVEN</strong> if it is impossible to say what the writer thinks about this</p>
+                        </div>
+
+                        <div class="tf-question" data-q-start="8" data-q-end="8">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">8</span>
+                                <span class="tf-question-text">There is little difference between the healthy diet recommended by advisors and diet prompted in food advertisements.</span>
+                            </div>
+                            <div class="tf-options">
+                                <label class="tf-option"><input type="radio" name="q8" value="YES"> YES</label>
+                                <label class="tf-option"><input type="radio" name="q8" value="NO"> NO</label>
+                                <label class="tf-option"><input type="radio" name="q8" value="NOT GIVEN"> NOT GIVEN</label>
+                            </div>
+                        </div>
+
+                        <div class="tf-question" data-q-start="9" data-q-end="9">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">9</span>
+                                <span class="tf-question-text">TV advertising has successfully taught children nutritional knowledge about vitamins and others.</span>
+                            </div>
+                            <div class="tf-options">
+                                <label class="tf-option"><input type="radio" name="q9" value="YES"> YES</label>
+                                <label class="tf-option"><input type="radio" name="q9" value="NO"> NO</label>
+                                <label class="tf-option"><input type="radio" name="q9" value="NOT GIVEN"> NOT GIVEN</label>
+                            </div>
+                        </div>
+
+                        <div class="tf-question" data-q-start="10" data-q-end="10">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">10</span>
+                                <span class="tf-question-text">It is hard to decide which aspect accompanied by TV viewing has caused weight problems or other detrimental effects on children.</span>
+                            </div>
+                            <div class="tf-options">
+                                <label class="tf-option"><input type="radio" name="q10" value="YES"> YES</label>
+                                <label class="tf-option"><input type="radio" name="q10" value="NO"> NO</label>
+                                <label class="tf-option"><input type="radio" name="q10" value="NOT GIVEN"> NOT GIVEN</label>
+                            </div>
+                        </div>
+
+                        <div class="tf-question" data-q-start="11" data-q-end="11">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">11</span>
+                                <span class="tf-question-text">The preference of food for children is affected by their age and gender.</span>
+                            </div>
+                            <div class="tf-options">
+                                <label class="tf-option"><input type="radio" name="q11" value="YES"> YES</label>
+                                <label class="tf-option"><input type="radio" name="q11" value="NO"> NO</label>
+                                <label class="tf-option"><input type="radio" name="q11" value="NOT GIVEN"> NOT GIVEN</label>
+                            </div>
+                        </div>
+
+                        <div class="tf-question" data-q-start="12" data-q-end="12">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">12</span>
+                                <span class="tf-question-text">The investigation primarily for food promotion on TV advertising tend to be partial and incomplete.</span>
+                            </div>
+                            <div class="tf-options">
+                                <label class="tf-option"><input type="radio" name="q12" value="YES"> YES</label>
+                                <label class="tf-option"><input type="radio" name="q12" value="NO"> NO</label>
+                                <label class="tf-option"><input type="radio" name="q12" value="NOT GIVEN"> NOT GIVEN</label>
+                            </div>
+                        </div>
+
+                        <div class="tf-question" data-q-start="13" data-q-end="13">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">13</span>
+                                <span class="tf-question-text">Wealthy parents tend to buy more "sensible food" for their children.</span>
+                            </div>
+                            <div class="tf-options">
+                                <label class="tf-option"><input type="radio" name="q13" value="YES"> YES</label>
+                                <label class="tf-option"><input type="radio" name="q13" value="NO"> NO</label>
+                                <label class="tf-option"><input type="radio" name="q13" value="NOT GIVEN"> NOT GIVEN</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- end .questions-container -->
+            </div><!-- end .questions-panel -->
+        </div><!-- end .panels-container -->
+    </div><!-- end .main-container -->
+
+    <!-- Nav Arrows -->
+    <div class="nav-arrows">
+        <button class="nav-arrow prev" id="prev-btn" onclick="previousQuestion()" title="Previous question">&#8592;</button>
+        <button class="nav-arrow next" id="next-btn" onclick="nextQuestion()" title="Next question">&#8594;</button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="nav-row" aria-label="Question navigation">
+        <div class="nav-questions-strip" id="nav-questions-strip">
+            <!-- Q1–Q13 buttons injected by JS -->
+        </div>
+        <button id="deliver-button" aria-label="Check your answers" class="footer__deliverButton___3FM07">
+            <span>Check Answers</span>
+        </button>
+    </nav>
+
+    <!-- Context Menu -->
+    <div id="contextMenu" class="context-menu">
+        <div id="menu-highlight" class="context-menu-item" onclick="highlightText()">Highlight</div>
+        <div id="menu-note" class="context-menu-item" onclick="addNote()">Note</div>
+        <div id="menu-clear" class="context-menu-item" onclick="clearHighlight()">Clear</div>
+        <div id="menu-clear-all" class="context-menu-item" onclick="clearAllHighlights()">Clear All</div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="results-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeResultsModal()">&times;</button>
+            <h2>Results</h2>
+            <div class="results-summary">
+                <p>Score: <span id="results-score"></span> / 13</p>
+                <p>IELTS Band: <span id="results-band"></span></p>
+            </div>
+            <div id="results-details" class="results-details-container"></div>
+        </div>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    // ── STATE ──
+    let currentQuestion = 1;
+    let selectedRange = null;
+    let timeInSeconds = 1200; // 20:00
+    let timerInterval = null;
+    let isTimerRunning = false;
+    let draggedItem = null;
+    let selectedDragItem = null;
+    let activeQuestionElement = null;
+
+    const TOTAL_QUESTIONS = 13;
+
+    // ── CORRECT ANSWERS ──
+    const correctAnswers = {
+        '1': 'viii',
+        '2': 'ii',
+        '3': 'vi',
+        '4': 'v',
+        '5': 'i',
+        '6': 'x',
+        '7': 'iii',
+        '8': 'NO',
+        '9': 'NO',
+        '10': 'YES',
+        '11': 'NOT GIVEN',
+        '12': 'YES',
+        '13': 'NOT GIVEN'
+    };
+
+    // ── DOM ──
+    const timerDisplay = document.getElementById('timer-display');
+    const timerToggleBtn = document.getElementById('timer-toggle-btn');
+    const timerResetBtn = document.getElementById('timer-reset-btn');
+    const deliverButton = document.getElementById('deliver-button');
+    const resizer = document.getElementById('resizer');
+    const passagePanel = document.getElementById('passage-panel');
+    const questionsPanel = document.getElementById('questions-panel');
+    const contextMenu = document.getElementById('contextMenu');
+
+    const playIcon = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M8 5v14l11-7L8 5z"/></svg>';
+    const pauseIcon = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+
+    // ── TIMER ──
+    function formatTime(s) {
+        const m = Math.floor(s / 60);
+        const sec = s % 60;
+        return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    }
+
+    function startTimer() {
+        if (isTimerRunning) return;
+        isTimerRunning = true;
+        timerToggleBtn.innerHTML = pauseIcon;
+        timerInterval = setInterval(() => {
+            if (timeInSeconds <= 0) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                checkAnswers();
+                return;
+            }
+            timeInSeconds--;
+            timerDisplay.textContent = formatTime(timeInSeconds);
+            if (timeInSeconds <= 120) timerDisplay.classList.add('urgent');
+        }, 1000);
+    }
+
+    function pauseTimer() {
+        if (!isTimerRunning) return;
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        timerToggleBtn.innerHTML = playIcon;
+    }
+
+    function toggleTimer() {
+        isTimerRunning ? pauseTimer() : startTimer();
+    }
+
+    function resetTimer() {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+        timeInSeconds = 1200;
+        timerDisplay.textContent = '20:00';
+        timerDisplay.classList.remove('urgent');
+        timerToggleBtn.innerHTML = playIcon;
+    }
+
+    timerToggleBtn.addEventListener('click', toggleTimer);
+    timerResetBtn.addEventListener('click', resetTimer);
+
+    // ── BACK BUTTON ──
+    document.getElementById('back-btn').addEventListener('click', () => history.back());
+
+    // ── PRE-TEST MODAL ──
+    document.getElementById('btn-exam-mode').addEventListener('click', () => {
+        document.getElementById('pretest-overlay').style.display = 'none';
+        document.body.classList.add('exam-mode');
+        startTimer();
+    });
+    document.getElementById('btn-practice-mode').addEventListener('click', () => {
+        document.getElementById('pretest-overlay').style.display = 'none';
+    });
+
+    // ── BUILD BOTTOM NAV (Q1–Q13) ──
+    const strip = document.getElementById('nav-questions-strip');
+    for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'subQuestion scorable-item';
+        btn.id = `nav-btn-${i}`;
+        btn.setAttribute('aria-label', `Question ${i}`);
+        btn.innerHTML = `<span class="sr-only">Question ${i}</span><span aria-hidden="true">${i}</span>`;
+        btn.addEventListener('click', () => goToQuestion(i));
+        strip.appendChild(btn);
+    }
+
+    // ── NAVIGATION ──
+    function goToQuestion(n) {
+        currentQuestion = n;
+        updateNavButtons();
+        scrollToQuestion(n);
+        highlightActiveQuestion(n);
+    }
+
+    function nextQuestion() {
+        if (currentQuestion < TOTAL_QUESTIONS) goToQuestion(currentQuestion + 1);
+    }
+
+    function previousQuestion() {
+        if (currentQuestion > 1) goToQuestion(currentQuestion - 1);
+    }
+
+    function updateNavButtons() {
+        document.querySelectorAll('.subQuestion.scorable-item').forEach(btn => {
+            const num = parseInt(btn.querySelector('span[aria-hidden]').textContent);
+            btn.classList.toggle('active', num === currentQuestion);
+        });
+        document.getElementById('prev-btn').disabled = currentQuestion <= 1;
+        document.getElementById('next-btn').disabled = currentQuestion >= TOTAL_QUESTIONS;
+    }
+
+    function scrollToQuestion(n) {
+        // For drop-zones (Q1-7): scroll passage panel
+        if (n >= 1 && n <= 7) {
+            const dz = passagePanel.querySelector(`.drop-zone[data-q-start="${n}"]`);
+            if (dz) dz.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        // For TF questions (Q8-13): scroll questions panel
+        if (n >= 8 && n <= 13) {
+            const el = questionsPanel.querySelector(`.tf-question[data-q-start="${n}"]`);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function highlightActiveQuestion(n) {
+        if (activeQuestionElement) activeQuestionElement.classList.remove('active-question');
+        let el = null;
+        if (n >= 1 && n <= 7) {
+            el = passagePanel.querySelector(`.drop-zone[data-q-start="${n}"]`);
+        } else {
+            el = questionsPanel.querySelector(`.tf-question[data-q-start="${n}"]`);
+        }
+        if (el) { el.classList.add('active-question'); activeQuestionElement = el; }
+    }
+
+    // ── ANSWERED INDICATOR ──
+    function isQuestionAnswered(n) {
+        if (n >= 1 && n <= 7) {
+            const dz = passagePanel.querySelector(`.drop-zone[data-q-start="${n}"]`);
+            return dz && dz.classList.contains('filled');
+        }
+        if (n >= 8 && n <= 13) {
+            return !!document.querySelector(`input[name="q${n}"]:checked`);
+        }
+        return false;
+    }
+
+    function updateAllIndicators() {
+        for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+            const btn = document.getElementById(`nav-btn-${i}`);
+            if (!btn) continue;
+            if (btn.classList.contains('correct') || btn.classList.contains('incorrect')) continue;
+            if (isQuestionAnswered(i)) {
+                btn.classList.add('answered');
+            } else {
+                btn.classList.remove('answered');
+            }
+        }
+    }
+
+    document.body.addEventListener('change', updateAllIndicators);
+
+    // ── DRAG & DROP ──
+    function initDragAndDrop() {
+        const dndGroup = 'p1-headings';
+        const bank = document.getElementById('headings-bank');
+        const dropZones = passagePanel.querySelectorAll(`.drop-zone[data-dnd-group="${dndGroup}"]`);
+
+        function getDragItems() {
+            return bank.querySelectorAll(`.drag-item[data-dnd-group="${dndGroup}"]`);
+        }
+
+        // Touch / click selection fallback
+        function selectDragItem(item) {
+            if (selectedDragItem) selectedDragItem.classList.remove('selected');
+            if (selectedDragItem === item) { selectedDragItem = null; return; }
+            selectedDragItem = item;
+            item.classList.add('selected');
+        }
+
+        // Delegate click on bank items
+        bank.addEventListener('click', (e) => {
+            const item = e.target.closest('.drag-item');
+            if (item) selectDragItem(item);
+        });
+
+        // Click on drop-zone: place selected item
+        dropZones.forEach(dz => {
+            dz.addEventListener('click', () => {
+                if (selectedDragItem) {
+                    // Return existing item in this zone to bank first
+                    const existing = dz.querySelector('.drag-item');
+                    if (existing) {
+                        existing.draggable = true;
+                        bank.appendChild(existing);
+                    }
+                    dz.appendChild(selectedDragItem);
+                    selectedDragItem.classList.remove('selected');
+                    selectedDragItem.draggable = false;
+                    dz.classList.add('filled');
+                    selectedDragItem = null;
+                    updateAllIndicators();
+                } else {
+                    // Click on a filled zone returns item to bank
+                    const existing = dz.querySelector('.drag-item');
+                    if (existing) {
+                        existing.draggable = true;
+                        bank.appendChild(existing);
+                        dz.classList.remove('filled');
+                        updateAllIndicators();
+                    }
+                }
+            });
+
+            // HTML5 drag events
+            dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag-over'); });
+            dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+            dz.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dz.classList.remove('drag-over');
+                if (!draggedItem) return;
+                const existing = dz.querySelector('.drag-item');
+                if (existing && existing !== draggedItem) {
+                    existing.draggable = true;
+                    bank.appendChild(existing);
+                }
+                dz.appendChild(draggedItem);
+                draggedItem.draggable = false;
+                dz.classList.add('filled');
+                draggedItem = null;
+                updateAllIndicators();
+            });
+        });
+
+        // Allow drag back to bank
+        bank.addEventListener('dragover', (e) => e.preventDefault());
+        bank.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (!draggedItem) return;
+            // Find the drop-zone that previously held this item and un-fill it
+            dropZones.forEach(dz => {
+                if (dz.contains(draggedItem)) dz.classList.remove('filled');
+            });
+            draggedItem.draggable = true;
+            bank.appendChild(draggedItem);
+            draggedItem = null;
+            updateAllIndicators();
+        });
+
+        // Setup existing drag items
+        function setupDragItem(item) {
+            item.addEventListener('dragstart', (e) => {
+                draggedItem = item;
+                item.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            item.addEventListener('dragend', () => {
+                item.classList.remove('dragging');
+                draggedItem = null;
+            });
+        }
+
+        getDragItems().forEach(setupDragItem);
+
+        // Observer for newly moved items
+        const observer = new MutationObserver(() => {
+            getDragItems().forEach(item => {
+                if (!item.dataset.dragInit) {
+                    setupDragItem(item);
+                    item.dataset.dragInit = '1';
+                }
+            });
+        });
+        observer.observe(bank, { childList: true });
+    }
+
+    initDragAndDrop();
+
+    // ── GET USER ANSWER ──
+    function getUserAnswer(n) {
+        if (n >= 1 && n <= 7) {
+            const dz = passagePanel.querySelector(`.drop-zone[data-q-start="${n}"]`);
+            if (dz && dz.classList.contains('filled')) {
+                const item = dz.querySelector('.drag-item');
+                return item ? item.dataset.value : null;
+            }
+            return null;
+        }
+        const radio = document.querySelector(`input[name="q${n}"]:checked`);
+        return radio ? radio.value : null;
+    }
+
+    // ── CHECK ANSWERS ──
+    function checkAnswers() {
+        let score = 0;
+        const resultsHTML = [];
+
+        for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+            const userAns = getUserAnswer(i);
+            const correctAns = correctAnswers[String(i)];
+            const isCorrect = userAns && userAns.toLowerCase() === correctAns.toLowerCase();
+            if (isCorrect) score++;
+
+            // Visual feedback on questions
+            applyResultStyle(i, isCorrect, userAns, correctAns);
+
+            resultsHTML.push(`
+                <div class="result-row ${isCorrect ? 'correct' : 'incorrect'}">
+                    <span class="q-num">Q${i}</span>
+                    <span class="user-ans">${userAns || '<em style="color:#aaa">—</em>'}</span>
+                    <span class="correct-ans">${correctAns}</span>
+                </div>
+            `);
+        }
+
+        // IELTS band estimate (out of 13, scaled)
+        const band = getBand(score);
+        document.getElementById('results-score').textContent = score;
+        document.getElementById('results-band').textContent = band;
+        document.getElementById('results-details').innerHTML = `
+            <div class="result-row" style="font-weight:700;background:#f3f4f6;border-bottom:2px solid #e5e7eb;">
+                <span>Q</span><span>Your Answer</span><span>Correct Answer</span>
+            </div>
+            ${resultsHTML.join('')}
+        `;
+
+        document.getElementById('results-modal').classList.remove('hidden');
+        document.body.classList.add('results-mode');
+
+        // Update nav button colors
+        for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+            const btn = document.getElementById(`nav-btn-${i}`);
+            if (!btn) continue;
+            const userAns = getUserAnswer(i);
+            const correctAns = correctAnswers[String(i)];
+            const isCorrect = userAns && userAns.toLowerCase() === correctAns.toLowerCase();
+            btn.classList.remove('answered', 'active');
+            btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+        }
+    }
+
+    function applyResultStyle(n, isCorrect, userAns, correctAns) {
+        if (n >= 1 && n <= 7) {
+            const dz = passagePanel.querySelector(`.drop-zone[data-q-start="${n}"]`);
+            if (dz) {
+                dz.classList.remove('drag-over');
+                dz.classList.add(isCorrect ? 'correct' : 'incorrect');
+            }
+        } else {
+            const tf = questionsPanel.querySelector(`.tf-question[data-q-start="${n}"]`);
+            if (tf) {
+                tf.querySelectorAll('.tf-option').forEach(opt => {
+                    const radio = opt.querySelector('input[type="radio"]');
+                    if (!radio) return;
+                    if (radio.checked && isCorrect) opt.classList.add('correct');
+                    else if (radio.checked && !isCorrect) opt.classList.add('incorrect');
+                    else if (radio.value === correctAns) opt.classList.add('correct-answer-highlight');
+                    radio.disabled = true;
+                });
+                tf.classList.add(isCorrect ? 'correct' : 'incorrect');
+            }
+        }
+    }
+
+    function getBand(score) {
+        // Approximate band from score/13
+        const pct = score / 13;
+        if (pct >= 0.97) return '9.0';
+        if (pct >= 0.88) return '8.5';
+        if (pct >= 0.78) return '8.0';
+        if (pct >= 0.68) return '7.5';
+        if (pct >= 0.58) return '7.0';
+        if (pct >= 0.47) return '6.5';
+        if (pct >= 0.38) return '6.0';
+        if (pct >= 0.28) return '5.5';
+        if (pct >= 0.18) return '5.0';
+        return '4.5';
+    }
+
+    deliverButton.addEventListener('click', checkAnswers);
+
+    // ── CLOSE RESULTS MODAL ──
+    window.closeResultsModal = function() {
+        document.getElementById('results-modal').classList.add('hidden');
+    };
+
+    // ── RESIZER ──
+    let isResizing = false;
+    resizer.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+        e.preventDefault();
+    });
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        const container = document.querySelector('.panels-container');
+        const rect = container.getBoundingClientRect();
+        const offset = e.clientX - rect.left;
+        const total = rect.width;
+        const leftPct = Math.min(Math.max((offset / total) * 100, 20), 80);
+        passagePanel.style.flex = 'none';
+        passagePanel.style.width = `${leftPct}%`;
+        questionsPanel.style.flex = 'none';
+        questionsPanel.style.width = `${100 - leftPct}%`;
+    });
+    document.addEventListener('mouseup', () => {
+        if (isResizing) { isResizing = false; document.body.style.cursor = ''; document.body.style.userSelect = ''; }
+    });
+
+    // Touch resizer
+    resizer.addEventListener('touchstart', (e) => { isResizing = true; e.preventDefault(); }, { passive: false });
+    document.addEventListener('touchmove', (e) => {
+        if (!isResizing) return;
+        const touch = e.touches[0];
+        const container = document.querySelector('.panels-container');
+        const rect = container.getBoundingClientRect();
+        const offset = touch.clientX - rect.left;
+        const total = rect.width;
+        const leftPct = Math.min(Math.max((offset / total) * 100, 20), 80);
+        passagePanel.style.flex = 'none';
+        passagePanel.style.width = `${leftPct}%`;
+        questionsPanel.style.flex = 'none';
+        questionsPanel.style.width = `${100 - leftPct}%`;
+    }, { passive: true });
+    document.addEventListener('touchend', () => { isResizing = false; });
+
+    // ── CONTEXT MENU (Highlight / Note / Clear) ──
+    const panels = [passagePanel, questionsPanel];
+    let selectedRangeForMenu = null;
+
+    document.addEventListener('selectionchange', () => {
+        const sel = window.getSelection();
+        if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+            const range = sel.getRangeAt(0);
+            if (panels.some(p => p.contains(range.commonAncestorContainer))) {
+                selectedRange = range;
+                contextMenu.targetElementForClear = null;
+            }
+        }
+    });
+
+    const showContextMenu = (e) => {
+        const target = e.target;
+        const isOnHighlight = target.closest('.highlight, .comment-highlight');
+        const isSelActive = selectedRange && selectedRange.toString().trim().length > 0;
+        let show = false;
+
+        if (isOnHighlight) {
+            document.getElementById('menu-highlight').style.display = 'none';
+            document.getElementById('menu-note').style.display = 'none';
+            document.getElementById('menu-clear').style.display = 'block';
+            document.getElementById('menu-clear-all').style.display = 'block';
+            contextMenu.targetElementForClear = isOnHighlight;
+            show = true;
+        } else if (isSelActive && panels.some(p => p.contains(selectedRange.commonAncestorContainer))) {
+            document.getElementById('menu-highlight').style.display = 'flex';
+            document.getElementById('menu-note').style.display = 'flex';
+            document.getElementById('menu-clear').style.display = 'none';
+            document.getElementById('menu-clear-all').style.display = 'block';
+            show = true;
+        }
+
+        if (show) {
+            e.preventDefault();
+            const mH = contextMenu.offsetHeight, mW = contextMenu.offsetWidth;
+            let left = e.pageX, top = e.pageY - mH - 5;
+            if (left + mW > window.innerWidth) left = window.innerWidth - mW - 5;
+            if (top < 0) top = e.pageY + 5;
+            contextMenu.style.left = `${left}px`;
+            contextMenu.style.top = `${top}px`;
+            contextMenu.style.display = 'block';
+        }
+    };
+
+    panels.forEach(p => p.addEventListener('contextmenu', showContextMenu));
+    document.addEventListener('click', (e) => {
+        if (contextMenu.style.display === 'block' && !contextMenu.contains(e.target)) closeContextMenu();
+    });
+
+    function closeContextMenu() {
+        contextMenu.style.display = 'none';
+        selectedRange = null;
+    }
+
+    function unwrapElement(el) {
+        const parent = el.parentNode;
+        if (!parent) return;
+        while (el.firstChild) parent.insertBefore(el.firstChild, el);
+        parent.removeChild(el);
+        parent.normalize();
+    }
+
+    window.highlightText = () => {
+        if (selectedRange && !selectedRange.collapsed) {
+            const span = document.createElement('span');
+            span.className = 'highlight';
+            span.appendChild(selectedRange.extractContents());
+            selectedRange.insertNode(span);
+        }
+        closeContextMenu();
+        window.getSelection().removeAllRanges();
+    };
+
+    window.addNote = () => {
+        const note = prompt('Enter your note:');
+        if (note && selectedRange && !selectedRange.collapsed) {
+            const span = document.createElement('span');
+            span.className = 'comment-highlight';
+            const tip = document.createElement('span');
+            tip.className = 'comment-tooltip';
+            tip.textContent = note;
+            span.appendChild(selectedRange.extractContents());
+            span.appendChild(tip);
+            selectedRange.insertNode(span);
+        }
+        closeContextMenu();
+        window.getSelection().removeAllRanges();
+    };
+
+    window.clearHighlight = () => {
+        const el = contextMenu.targetElementForClear;
+        if (el) unwrapElement(el);
+        closeContextMenu();
+        window.getSelection().removeAllRanges();
+    };
+
+    window.clearAllHighlights = () => {
+        document.querySelectorAll('.highlight, .comment-highlight').forEach(unwrapElement);
+        closeContextMenu();
+        window.getSelection().removeAllRanges();
+    };
+
+    // ── GLOBAL EXPOSURE ──
+    window.nextQuestion = nextQuestion;
+    window.previousQuestion = previousQuestion;
+    window.goToQuestion = goToQuestion;
+
+    // ── INITIALIZE ──
+    updateNavButtons();
+    updateAllIndicators();
+    timerToggleBtn.innerHTML = playIcon;
+
+});
+</script>
+</body>
+</html>

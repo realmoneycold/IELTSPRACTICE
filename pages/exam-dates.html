@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style id="styleguide-variables">
+    :root {
+      --vId-color-token-a: #1C6758;
+      --vId-color-token-b: #3D8361;
+      --vId-color-token-c: #000;
+      --vId-color-token-d: #fff;
+      --vId-c58c1989-ada3-4666-90df-67ca3f601e2a: #D6CDA4;
+      --vId-f5d7075a-c172-42b4-a062-4ca7a3cad9bb: #151614ff;
+      --vId-font-token-a: Poppins;
+    }
+  </style>
+  <title>IELTSPRACTICE — Exam &amp; Mock Test Booking</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.7.2/css/all.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Home page CSS for header styles -->
+  <link rel="stylesheet" type="text/css" href="../index.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: { DEFAULT: '#1a365d', dark: '#0f2240', light: '#254e8a', muted: '#2d4a73' },
+            accent: { orange: '#e8621a', orangeHover: '#cf5415' },
+            success: '#1a8a5a',
+            cream: '#f8f6f1',
+          },
+          fontFamily: {
+            display: ['Playfair Display', 'serif'],
+            body: ['DM Sans', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    /* ── Page body ── */
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f8f6f1;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ───────────────────────────────────────────
+       HEADER — pixel-matched to screenshot
+    ─────────────────────────────────────────── */
+    .site-header {
+      background-color: #151614;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      padding: 0 40px;
+      height: 72px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.45);
+    }
+
+    .site-header .logo {
+      font-family: 'Poppins', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+
+    .site-header nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .site-header nav a {
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.88);
+      text-decoration: none;
+      padding: 6px 18px;
+      border-radius: 6px;
+      transition: color 0.2s, background 0.2s;
+      white-space: nowrap;
+    }
+
+    .site-header nav a:hover {
+      color: #ffffff;
+      background: rgba(255,255,255,0.07);
+    }
+
+    .site-header nav a.active {
+      color: #ffffff;
+      font-weight: 500;
+    }
+
+    .site-header .btn-get-started {
+      font-family: 'Poppins', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: #ffffff;
+      background: #1C6758;
+      border: none;
+      border-radius: 100px;
+      padding: 12px 28px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, transform 0.1s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .site-header .btn-get-started:hover {
+      background: #165248;
+      transform: scale(1.03);
+    }
+
+    /* Mobile hamburger */
+    .site-header .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    @media (max-width: 900px) {
+      .site-header nav { display: none; }
+      .site-header .btn-get-started { display: none; }
+      .site-header .mobile-menu-btn { display: block; }
+    }
+
+    @media (max-width: 480px) {
+      .site-header { padding: 0 20px; }
+    }
+
+    /* ── Sidebar ── */
+    .sidebar { background: #fff; border-right: 1px solid #e5e0d8; }
+    .filter-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #7a6e60; margin-bottom: 6px; display: block; }
+    .filter-input { width: 100%; border: 1.5px solid #e0dbd2; border-radius: 8px; padding: 8px 12px; font-size: 0.875rem; font-family: 'DM Sans', sans-serif; color: #1a365d; background: #faf9f7; outline: none; transition: border-color .2s; }
+    .filter-input:focus { border-color: #1a365d; }
+
+    .toggle-group { display: flex; border-radius: 8px; overflow: hidden; border: 1.5px solid #e0dbd2; }
+    .toggle-btn { flex: 1; padding: 7px 0; font-size: 0.78rem; font-weight: 500; text-align: center; cursor: pointer; background: #faf9f7; color: #7a6e60; transition: all .2s; border: none; }
+    .toggle-btn.active { background: #1a365d; color: #fff; }
+    .toggle-btn + .toggle-btn { border-left: 1.5px solid #e0dbd2; }
+
+    input[type=range] { -webkit-appearance: none; height: 4px; background: #e0dbd2; border-radius: 2px; outline: none; cursor: pointer; width: 100%; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #1a365d; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+
+    /* ── Cards ── */
+    .exam-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(26,54,93,.07); border: 1px solid #ede8df; transition: transform .2s, box-shadow .2s; overflow: hidden; }
+    .exam-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(26,54,93,.13); }
+
+    .date-block { background: #1a365d; color: #fff; width: 72px; min-width: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 14px 8px; border-radius: 10px; }
+    .date-block .day-num { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; line-height: 1; }
+    .date-block .month { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; opacity: .8; }
+    .date-block .weekday { font-size: 0.68rem; opacity: .65; margin-top: 3px; }
+
+    .seat-bar { height: 5px; background: #eae5dc; border-radius: 3px; overflow: hidden; }
+    .seat-bar-fill { height: 100%; border-radius: 3px; }
+    .seat-critical { background: #e8621a; }
+    .seat-low { background: #f0a020; }
+    .seat-ok { background: #1a8a5a; }
+
+    .tag { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; letter-spacing: 0.04em; }
+    .tag-official { background: #e8f0fb; color: #1a365d; }
+    .tag-mock { background: #fff3e8; color: #c25510; }
+    .tag-computer { background: #e8f5f0; color: #1a6a45; }
+    .tag-paper { background: #f0f0f8; color: #444488; }
+    .tag-academic { background: #fdf0f8; color: #8a1a5d; }
+    .tag-general { background: #f5f8e8; color: #5a6a1a; }
+
+    .book-btn { background: #e8621a; color: #fff; border: none; border-radius: 10px; padding: 10px 22px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: background .2s, transform .1s; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+    .book-btn:hover { background: #cf5415; transform: scale(1.03); }
+
+    .pay-card { background: linear-gradient(135deg, #1a365d 0%, #0f2240 100%); color: #fff; border-radius: 16px; }
+
+    .hero-strip { background: linear-gradient(90deg, #1a365d 0%, #254e8a 60%, #1a365d 100%); position: relative; overflow: hidden; }
+    .hero-strip::before { content: ''; position: absolute; right: 60px; top: -40px; width: 180px; height: 180px; border-radius: 50%; background: rgba(232,98,26,0.12); }
+    .hero-strip::after { content: ''; position: absolute; right: -20px; bottom: -60px; width: 220px; height: 220px; border-radius: 50%; background: rgba(232,98,26,0.07); }
+
+    #sidebar { transition: transform .3s; }
+    @media (max-width: 1023px) {
+      #sidebar { position: fixed; left: 0; top: 0; height: 100vh; z-index: 50; transform: translateX(-100%); width: 280px; overflow-y: auto; }
+      #sidebar.open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,.2); }
+    }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .exam-card { animation: fadeUp .4s ease both; }
+    .exam-card:nth-child(1) { animation-delay: .05s; }
+    .exam-card:nth-child(2) { animation-delay: .1s; }
+    .exam-card:nth-child(3) { animation-delay: .15s; }
+    .exam-card:nth-child(4) { animation-delay: .2s; }
+    .exam-card:nth-child(5) { animation-delay: .25s; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f0ece4; }
+    ::-webkit-scrollbar-thumb { background: #c8bfaf; border-radius: 3px; }
+
+    /* Mobile sidebar overlay */
+    #sidebarOverlay { background: rgba(0,0,0,0.4); }
+  </style>
+</head>
+<body class="min-h-screen" style="background:#f8f6f1">
+
+<!-- ═══════════════════════════════════════════
+     HEADER — matched to screenshot design
+═══════════════════════════════════════════ -->
+<header class="site-header">
+  <span class="logo">IELTS PRACTICE</span>
+  <nav>
+    <a href="../index.html">Home</a>
+    <a href="./exam-dates.html" class="active">Exam &amp; Mock Dates</a>
+    <a href="./education-centres.html">Education Centres</a>
+    <a href="../contact.html">Contact</a>
+  </nav>
+  <a href="#" class="btn-get-started">Get Started</a>
+  <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fa-solid fa-bars"></i></button>
+</header>
+
+<!-- Mobile overlay -->
+<div id="sidebarOverlay" class="fixed inset-0 z-30 hidden" onclick="closeMobileNav()"></div>
+
+<!-- ═══════════════════════════════════════════
+     HERO STRIP
+═══════════════════════════════════════════ -->
+<div class="hero-strip px-6 py-5">
+  <div class="max-w-screen-xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
+    <div>
+      <h1 class="font-display text-white text-2xl sm:text-3xl font-bold">Exam &amp; Mock Test Booking</h1>
+      <p class="text-sm mt-1" style="color:rgba(255,255,255,0.65)">Find official IELTS exams and mock tests across Uzbekistan</p>
+    </div>
+    <div class="flex items-center gap-5 text-sm" style="color:rgba(255,255,255,0.75)">
+      <span class="flex items-center gap-1.5"><i class="fa-solid fa-calendar-check" style="color:#e8621a"></i> 24 upcoming dates</span>
+      <span class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot" style="color:#e8621a"></i> 6 cities</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     LAYOUT
+═══════════════════════════════════════════ -->
+<div class="max-w-screen-xl mx-auto flex gap-0 lg:gap-6 px-0 sm:px-4 lg:px-6 py-6">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar w-64 lg:w-72 flex-shrink-0 rounded-none lg:rounded-2xl p-5 pt-6 self-start lg:sticky" style="top:80px">
+    <div class="flex items-center justify-between mb-5 lg:hidden">
+      <span class="font-display text-lg font-bold" style="color:#1a365d">Filters</span>
+      <button onclick="closeSidebar()" style="color:#1a365d;opacity:.6"><i class="fa-solid fa-xmark text-xl"></i></button>
+    </div>
+    <div class="hidden lg:flex items-center gap-2 mb-5">
+      <i class="fa-solid fa-sliders text-sm" style="color:rgba(26,54,93,0.45)"></i>
+      <span class="font-semibold text-sm tracking-wide" style="color:#1a365d">FILTER RESULTS</span>
+    </div>
+
+    <div class="space-y-5">
+      <div>
+        <label class="filter-label">Search Venue</label>
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-sm" style="color:rgba(26,54,93,0.3)"></i>
+          <input type="text" placeholder="e.g. British Council…" class="filter-input" style="padding-left:2.25rem" id="searchInput" oninput="applyFilters()"/>
+        </div>
+      </div>
+
+      <div>
+        <label class="filter-label">City</label>
+        <select class="filter-input" id="cityFilter" onchange="applyFilters()">
+          <option value="">All Cities</option>
+          <option>Tashkent</option>
+          <option>Samarkand</option>
+          <option>Bukhara</option>
+          <option>Namangan</option>
+          <option>Fergana</option>
+          <option>Navoi</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="filter-label">Date</label>
+        <input type="date" class="filter-input" id="dateFilter" onchange="applyFilters()"/>
+      </div>
+
+      <div>
+        <label class="filter-label">Test Type</label>
+        <div class="toggle-group" id="testTypeGroup">
+          <button class="toggle-btn active" onclick="setToggle('testTypeGroup',this)">All</button>
+          <button class="toggle-btn" onclick="setToggle('testTypeGroup',this)">Official</button>
+          <button class="toggle-btn" onclick="setToggle('testTypeGroup',this)">Mock</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="filter-label">Module</label>
+        <div class="toggle-group" id="moduleGroup">
+          <button class="toggle-btn active" onclick="setToggle('moduleGroup',this)">All</button>
+          <button class="toggle-btn" onclick="setToggle('moduleGroup',this)">Academic</button>
+          <button class="toggle-btn" onclick="setToggle('moduleGroup',this)">General</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="filter-label">Format</label>
+        <div class="toggle-group" id="formatGroup">
+          <button class="toggle-btn active" onclick="setToggle('formatGroup',this)">All</button>
+          <button class="toggle-btn" onclick="setToggle('formatGroup',this)">Computer</button>
+          <button class="toggle-btn" onclick="setToggle('formatGroup',this)">Paper</button>
+        </div>
+      </div>
+
+      <div>
+        <label class="filter-label">Max Price (UZS)</label>
+        <div class="space-y-2">
+          <input type="range" min="50000" max="3000000" step="50000" value="3000000" id="priceSlider" oninput="updatePrice(this.value)"/>
+          <div class="flex justify-between text-xs font-medium" style="color:rgba(26,54,93,0.55)">
+            <span>50,000</span>
+            <span id="priceDisplay" style="color:#1a365d;font-weight:600">3,000,000 UZS</span>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="resetFilters()" class="w-full py-2 text-sm font-semibold rounded-lg transition-colors" style="color:rgba(26,54,93,0.55);border:1.5px solid rgba(26,54,93,0.18)" onmouseover="this.style.color='#1a365d';this.style.borderColor='rgba(26,54,93,0.35)'" onmouseout="this.style.color='rgba(26,54,93,0.55)';this.style.borderColor='rgba(26,54,93,0.18)'">
+        <i class="fa-solid fa-rotate-left mr-1.5 text-xs"></i> Reset Filters
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 min-w-0 px-4 sm:px-0">
+
+    <div class="flex items-center justify-between mb-4">
+      <p class="text-sm font-medium" style="color:rgba(26,54,93,0.55)"><span id="resultCount">5</span> results found</p>
+      <select class="filter-input w-auto text-sm py-2">
+        <option>Sort: Soonest first</option>
+        <option>Sort: Price low–high</option>
+        <option>Sort: Price high–low</option>
+        <option>Sort: Most seats</option>
+      </select>
+    </div>
+
+    <div class="space-y-4" id="cardsContainer">
+
+      <!-- Card 1 -->
+      <div class="exam-card p-5" data-type="Official" data-module="Academic" data-format="Computer" data-city="Tashkent" data-price="1350000" data-venue="british council tashkent">
+        <div class="flex gap-4 items-start flex-wrap sm:flex-nowrap">
+          <div class="date-block">
+            <span class="day-num">14</span>
+            <span class="month">Jul</span>
+            <span class="weekday">Monday</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap gap-2 mb-2">
+              <span class="tag tag-official"><i class="fa-solid fa-certificate text-xs"></i> Official IDP IELTS</span>
+              <span class="tag tag-academic">Academic</span>
+              <span class="tag tag-computer"><i class="fa-solid fa-desktop text-xs"></i> Computer</span>
+            </div>
+            <div class="flex items-center gap-1.5 font-semibold text-base mb-1" style="color:#1a365d">
+              <i class="fa-solid fa-location-dot text-sm" style="color:#e8621a"></i>
+              British Council Tashkent
+            </div>
+            <div class="text-xs mb-3 ml-5" style="color:rgba(26,54,93,0.5)">Amir Temur Ave 21, Tashkent · <a href="#" style="color:rgba(26,54,93,0.65);text-decoration:underline">View map</a></div>
+            <div class="mb-1 flex items-center justify-between text-xs font-medium">
+              <span class="font-semibold" style="color:#c0392b"><i class="fa-solid fa-fire text-xs mr-1"></i>Only 5 seats remaining!</span>
+              <span style="color:rgba(26,54,93,0.45)">5 / 30</span>
+            </div>
+            <div class="seat-bar mb-1"><div class="seat-bar-fill seat-critical" style="width:83%"></div></div>
+          </div>
+          <div class="flex flex-col items-end justify-between gap-3" style="min-width:max-content">
+            <div class="text-right">
+              <div class="text-xs font-medium mb-0.5" style="color:rgba(26,54,93,0.4)">Registration fee</div>
+              <div class="text-xl font-bold" style="color:#1a365d">1,350,000</div>
+              <div class="text-xs" style="color:rgba(26,54,93,0.45)">UZS</div>
+            </div>
+            <button class="book-btn"><i class="fa-solid fa-pen-to-square mr-1.5 text-xs"></i>Book Now</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="exam-card p-5" data-type="Mock" data-module="General" data-format="Computer" data-city="Tashkent" data-price="280000" data-venue="ieltspractice hub tashkent">
+        <div class="flex gap-4 items-start flex-wrap sm:flex-nowrap">
+          <div class="date-block" style="background:#c25510">
+            <span class="day-num">18</span>
+            <span class="month">Jul</span>
+            <span class="weekday">Friday</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap gap-2 mb-2">
+              <span class="tag tag-mock"><i class="fa-solid fa-flask text-xs"></i> Mock Test</span>
+              <span class="tag tag-general">General Training</span>
+              <span class="tag tag-computer"><i class="fa-solid fa-desktop text-xs"></i> Computer</span>
+            </div>
+            <div class="flex items-center gap-1.5 font-semibold text-base mb-1" style="color:#1a365d">
+              <i class="fa-solid fa-location-dot text-sm" style="color:#e8621a"></i>
+              IELTSPRACTICE Hub Tashkent
+            </div>
+            <div class="text-xs mb-3 ml-5" style="color:rgba(26,54,93,0.5)">Chilonzor 7, Tashkent · <a href="#" style="color:rgba(26,54,93,0.65);text-decoration:underline">View map</a></div>
+            <div class="mb-1 flex items-center justify-between text-xs font-medium">
+              <span class="font-semibold" style="color:#1a8a5a"><i class="fa-solid fa-circle-check text-xs mr-1"></i>18 seats available</span>
+              <span style="color:rgba(26,54,93,0.45)">12 / 30</span>
+            </div>
+            <div class="seat-bar mb-1"><div class="seat-bar-fill seat-ok" style="width:40%"></div></div>
+          </div>
+          <div class="flex flex-col items-end justify-between gap-3" style="min-width:max-content">
+            <div class="text-right">
+              <div class="text-xs font-medium mb-0.5" style="color:rgba(26,54,93,0.4)">Registration fee</div>
+              <div class="text-xl font-bold" style="color:#1a365d">280,000</div>
+              <div class="text-xs" style="color:rgba(26,54,93,0.45)">UZS</div>
+            </div>
+            <button class="book-btn"><i class="fa-solid fa-pen-to-square mr-1.5 text-xs"></i>Book Now</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="exam-card p-5" data-type="Official" data-module="Academic" data-format="Paper" data-city="Samarkand" data-price="1350000" data-venue="samarkand international university centre">
+        <div class="flex gap-4 items-start flex-wrap sm:flex-nowrap">
+          <div class="date-block">
+            <span class="day-num">26</span>
+            <span class="month">Jul</span>
+            <span class="weekday">Saturday</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap gap-2 mb-2">
+              <span class="tag tag-official"><i class="fa-solid fa-certificate text-xs"></i> Official British Council</span>
+              <span class="tag tag-academic">Academic</span>
+              <span class="tag tag-paper"><i class="fa-solid fa-file-lines text-xs"></i> Paper-based</span>
+            </div>
+            <div class="flex items-center gap-1.5 font-semibold text-base mb-1" style="color:#1a365d">
+              <i class="fa-solid fa-location-dot text-sm" style="color:#e8621a"></i>
+              Samarkand International University Centre
+            </div>
+            <div class="text-xs mb-3 ml-5" style="color:rgba(26,54,93,0.5)">University Blvd, Samarkand · <a href="#" style="color:rgba(26,54,93,0.65);text-decoration:underline">View map</a></div>
+            <div class="mb-1 flex items-center justify-between text-xs font-medium">
+              <span class="font-semibold" style="color:#d97706"><i class="fa-solid fa-triangle-exclamation text-xs mr-1"></i>Only 9 seats left</span>
+              <span style="color:rgba(26,54,93,0.45)">9 / 25</span>
+            </div>
+            <div class="seat-bar mb-1"><div class="seat-bar-fill seat-low" style="width:64%"></div></div>
+          </div>
+          <div class="flex flex-col items-end justify-between gap-3" style="min-width:max-content">
+            <div class="text-right">
+              <div class="text-xs font-medium mb-0.5" style="color:rgba(26,54,93,0.4)">Registration fee</div>
+              <div class="text-xl font-bold" style="color:#1a365d">1,350,000</div>
+              <div class="text-xs" style="color:rgba(26,54,93,0.45)">UZS</div>
+            </div>
+            <button class="book-btn"><i class="fa-solid fa-pen-to-square mr-1.5 text-xs"></i>Book Now</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="exam-card p-5" data-type="Mock" data-module="Academic" data-format="Paper" data-city="Fergana" data-price="150000" data-venue="fergana language academy">
+        <div class="flex gap-4 items-start flex-wrap sm:flex-nowrap">
+          <div class="date-block" style="background:#c25510">
+            <span class="day-num">02</span>
+            <span class="month">Aug</span>
+            <span class="weekday">Saturday</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap gap-2 mb-2">
+              <span class="tag tag-mock"><i class="fa-solid fa-flask text-xs"></i> Mock Test</span>
+              <span class="tag tag-academic">Academic</span>
+              <span class="tag tag-paper"><i class="fa-solid fa-file-lines text-xs"></i> Paper-based</span>
+            </div>
+            <div class="flex items-center gap-1.5 font-semibold text-base mb-1" style="color:#1a365d">
+              <i class="fa-solid fa-location-dot text-sm" style="color:#e8621a"></i>
+              Fergana Language Academy
+            </div>
+            <div class="text-xs mb-3 ml-5" style="color:rgba(26,54,93,0.5)">Mustaqillik ko'chasi 14, Fergana · <a href="#" style="color:rgba(26,54,93,0.65);text-decoration:underline">View map</a></div>
+            <div class="mb-1 flex items-center justify-between text-xs font-medium">
+              <span class="font-semibold" style="color:#1a8a5a"><i class="fa-solid fa-circle-check text-xs mr-1"></i>22 seats available</span>
+              <span style="color:rgba(26,54,93,0.45)">3 / 25</span>
+            </div>
+            <div class="seat-bar mb-1"><div class="seat-bar-fill seat-ok" style="width:12%"></div></div>
+          </div>
+          <div class="flex flex-col items-end justify-between gap-3" style="min-width:max-content">
+            <div class="text-right">
+              <div class="text-xs font-medium mb-0.5" style="color:rgba(26,54,93,0.4)">Registration fee</div>
+              <div class="text-xl font-bold" style="color:#1a365d">150,000</div>
+              <div class="text-xs" style="color:rgba(26,54,93,0.45)">UZS</div>
+            </div>
+            <button class="book-btn"><i class="fa-solid fa-pen-to-square mr-1.5 text-xs"></i>Book Now</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="exam-card p-5" data-type="Official" data-module="General" data-format="Computer" data-city="Bukhara" data-price="1350000" data-venue="bukhara education centre">
+        <div class="flex gap-4 items-start flex-wrap sm:flex-nowrap">
+          <div class="date-block">
+            <span class="day-num">09</span>
+            <span class="month">Aug</span>
+            <span class="weekday">Saturday</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap gap-2 mb-2">
+              <span class="tag tag-official"><i class="fa-solid fa-certificate text-xs"></i> Official IDP IELTS</span>
+              <span class="tag tag-general">General Training</span>
+              <span class="tag tag-computer"><i class="fa-solid fa-desktop text-xs"></i> Computer</span>
+            </div>
+            <div class="flex items-center gap-1.5 font-semibold text-base mb-1" style="color:#1a365d">
+              <i class="fa-solid fa-location-dot text-sm" style="color:#e8621a"></i>
+              Bukhara Education Centre
+            </div>
+            <div class="text-xs mb-3 ml-5" style="color:rgba(26,54,93,0.5)">Navruz ko'chasi 3, Bukhara · <a href="#" style="color:rgba(26,54,93,0.65);text-decoration:underline">View map</a></div>
+            <div class="mb-1 flex items-center justify-between text-xs font-medium">
+              <span class="font-semibold" style="color:#1a8a5a"><i class="fa-solid fa-circle-check text-xs mr-1"></i>15 seats available</span>
+              <span style="color:rgba(26,54,93,0.45)">10 / 25</span>
+            </div>
+            <div class="seat-bar mb-1"><div class="seat-bar-fill seat-ok" style="width:40%"></div></div>
+          </div>
+          <div class="flex flex-col items-end justify-between gap-3" style="min-width:max-content">
+            <div class="text-right">
+              <div class="text-xs font-medium mb-0.5" style="color:rgba(26,54,93,0.4)">Registration fee</div>
+              <div class="text-xl font-bold" style="color:#1a365d">1,350,000</div>
+              <div class="text-xs" style="color:rgba(26,54,93,0.45)">UZS</div>
+            </div>
+            <button class="book-btn"><i class="fa-solid fa-pen-to-square mr-1.5 text-xs"></i>Book Now</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- No results -->
+      <div id="noResults" class="hidden text-center py-16" style="color:rgba(26,54,93,0.4)">
+        <i class="fa-solid fa-calendar-xmark text-5xl mb-4 block" style="color:rgba(26,54,93,0.15)"></i>
+        <p class="text-lg font-semibold" style="color:rgba(26,54,93,0.35)">No exams match your filters</p>
+        <p class="text-sm mt-1">Try adjusting your search criteria</p>
+      </div>
+    </div>
+
+    <!-- HOW TO PAY -->
+    <div class="pay-card mt-8 p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-9 h-9 rounded-full flex items-center justify-center" style="background:rgba(255,255,255,0.15)">
+          <i class="fa-solid fa-credit-card" style="color:#e8621a"></i>
+        </div>
+        <div>
+          <h3 class="font-display text-white text-lg font-bold">How to Pay</h3>
+          <p class="text-xs" style="color:rgba(255,255,255,0.55)">Secure payment methods accepted in Uzbekistan</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="rounded-xl p-4 flex items-center gap-3 transition-colors cursor-pointer" style="background:rgba(255,255,255,0.1)" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background:#00A859">
+            <i class="fa-solid fa-mobile-screen text-white text-lg"></i>
+          </div>
+          <div>
+            <div class="text-white font-semibold text-sm">Payme</div>
+            <div class="text-xs mt-0.5" style="color:rgba(255,255,255,0.5)">Pay via Payme · Uzcard / Humo</div>
+          </div>
+        </div>
+        <div class="rounded-xl p-4 flex items-center gap-3 transition-colors cursor-pointer" style="background:rgba(255,255,255,0.1)" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background:#0055AA">
+            <i class="fa-solid fa-bolt text-white text-lg"></i>
+          </div>
+          <div>
+            <div class="text-white font-semibold text-sm">Click</div>
+            <div class="text-xs mt-0.5" style="color:rgba(255,255,255,0.5)">Pay via Click · Bank transfer</div>
+          </div>
+        </div>
+        <div class="rounded-xl p-4 flex items-center gap-3 transition-colors cursor-pointer" style="background:rgba(255,255,255,0.1)" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background:#7B2D8B">
+            <i class="fa-solid fa-basket-shopping text-white text-lg"></i>
+          </div>
+          <div>
+            <div class="text-white font-semibold text-sm">Uzum Bank</div>
+            <div class="text-xs mt-0.5" style="color:rgba(255,255,255,0.5)">Pay via Uzum · Installments</div>
+          </div>
+        </div>
+      </div>
+      <p class="text-xs mt-4 flex items-center gap-1.5" style="color:rgba(255,255,255,0.35)">
+        <i class="fa-solid fa-lock text-xs"></i>
+        All payments are encrypted and processed securely. Registration is confirmed instantly upon payment.
+      </p>
+    </div>
+
+    <div class="mt-6 text-center text-xs pb-8" style="color:rgba(26,54,93,0.3)">
+      © 2025 IELTSPRACTICE · Not affiliated with IDP or British Council · IELTS is a registered trademark
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MOBILE SIDEBAR TOGGLE (filter panel)
+═══════════════════════════════════════════ -->
+<script>
+  // ── Mobile filter sidebar ──
+  const sidebar = document.getElementById('sidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function closeMobileNav() {
+    document.body.style.overflow = '';
+  }
+
+  // Mobile hamburger (opens filter sidebar on small screens)
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', () => {
+      sidebar.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  }
+
+  // ── Filters ──
+  function setToggle(groupId, btn) {
+    document.querySelectorAll('#' + groupId + ' .toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  }
+
+  function updatePrice(val) {
+    document.getElementById('priceDisplay').textContent = Number(val).toLocaleString('en-US') + ' UZS';
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const search  = document.getElementById('searchInput').value.toLowerCase().trim();
+    const city    = document.getElementById('cityFilter').value;
+    const maxPrice = parseInt(document.getElementById('priceSlider').value);
+    const typeActive   = document.querySelector('#testTypeGroup .toggle-btn.active').textContent.trim();
+    const moduleActive = document.querySelector('#moduleGroup   .toggle-btn.active').textContent.trim();
+    const formatActive = document.querySelector('#formatGroup   .toggle-btn.active').textContent.trim();
+
+    const cards = document.querySelectorAll('#cardsContainer .exam-card');
+    let visible = 0;
+
+    cards.forEach(card => {
+      const type     = card.dataset.type;
+      const module   = card.dataset.module;
+      const format   = card.dataset.format;
+      const cardCity = card.dataset.city;
+      const price    = parseInt(card.dataset.price);
+      const venue    = card.dataset.venue;
+
+      let show = true;
+      if (search && !venue.includes(search) && !cardCity.toLowerCase().includes(search)) show = false;
+      if (city && cardCity !== city) show = false;
+      if (price > maxPrice) show = false;
+      if (typeActive   === 'Official'  && type   !== 'Official')  show = false;
+      if (typeActive   === 'Mock'      && type   !== 'Mock')       show = false;
+      if (moduleActive === 'Academic'  && module !== 'Academic')   show = false;
+      if (moduleActive === 'General'   && module !== 'General')    show = false;
+      if (formatActive === 'Computer'  && format !== 'Computer')   show = false;
+      if (formatActive === 'Paper'     && format !== 'Paper')      show = false;
+
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    document.getElementById('resultCount').textContent = visible;
+    document.getElementById('noResults').classList.toggle('hidden', visible > 0);
+  }
+
+  function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('cityFilter').value  = '';
+    document.getElementById('dateFilter').value  = '';
+    document.getElementById('priceSlider').value = 3000000;
+    document.getElementById('priceDisplay').textContent = '3,000,000 UZS';
+    ['testTypeGroup','moduleGroup','formatGroup'].forEach(id => {
+      document.querySelectorAll('#' + id + ' .toggle-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+    });
+    applyFilters();
+  }
+</script>
+</body>
+</html>

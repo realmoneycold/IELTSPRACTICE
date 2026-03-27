@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading — Part 3 | Set 3 | IELTSPRACTICE</title>
+    <style>
+        /* ─── BASE RESET ─── */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            line-height: 1.4;
+            font-size: 16px;
+        }
+
+        /* ─── HEADER ─── */
+        .header {
+            background-color: #ffffff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            height: 60px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .ielts-logo {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #1a1a2e;
+            text-decoration: none;
+            gap: 6px;
+        }
+
+        .ielts-logo-badge {
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .back-btn {
+            background: none;
+            border: 1.5px solid #ccc;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .back-btn:hover { background: #f5f5f5; border-color: #999; }
+
+        .exam-mode-badge {
+            display: none;
+            background: #dc3545;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 99px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        body.exam-mode .exam-mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        body.exam-mode .exam-mode-badge::before {
+            content: '';
+            display: inline-block;
+            width: 7px; height: 7px;
+            background: #fff;
+            border-radius: 50%;
+            animation: blink 1.2s infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.2} }
+
+        body.exam-mode #timer-toggle-btn,
+        body.exam-mode #timer-reset-btn { display: none !important; }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+        .timer-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 15px;
+        }
+        .timer-controls button {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            padding: 0;
+            cursor: pointer;
+            width: 32px; height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        .timer-controls button:hover { background: #e0e0e0; }
+        .timer-controls button svg { width: 20px; height: 20px; fill: #333; }
+        body.exam-mode .timer-display.urgent { color: #dc3545; font-weight: 700; }
+
+        /* ─── MAIN CONTAINER ─── */
+        .main-container {
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            height: calc(100vh - 60px);
+            position: relative;
+        }
+
+        .panels-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .passage-panel {
+            flex: 1;
+            padding: 20px 20px 100px;
+            overflow-y: auto;
+            min-width: 200px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .passage-panel::-webkit-scrollbar { width: 8px; background: transparent; }
+        .passage-panel::-webkit-scrollbar-track { background: transparent; }
+        .passage-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+
+        .questions-panel {
+            flex: 1;
+            padding: 20px 20px 100px;
+            overflow-y: auto;
+            min-width: 200px;
+            border-left: 1px solid #e0e0e0;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .questions-panel::-webkit-scrollbar { width: 8px; background: transparent; }
+        .questions-panel::-webkit-scrollbar-track { background: transparent; }
+        .questions-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+
+        /* ─── RESIZER ─── */
+        .resizer {
+            position: relative;
+            background: transparent;
+            cursor: col-resize;
+            flex-shrink: 0;
+            flex-grow: 0;
+            z-index: 5;
+            width: 16px;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .resizer::before {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0; left: 50%;
+            width: 3px;
+            transform: translateX(-50%);
+            background-color: #3e3e3e;
+        }
+        .resizer::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 36px; height: 36px;
+            background-color: #ffffff;
+            border: 2px solid #3e3e3e;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="%233e3e3e" fill="%233e3e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><line x1="4" y1="12" x2="20" y2="12"/></svg>');
+            background-repeat: no-repeat;
+            background-size: 60% 60%;
+            background-position: center;
+            pointer-events: none;
+        }
+
+        /* ─── PASSAGE CONTENT ─── */
+        .reading-passage h4 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .reading-passage p { margin-bottom: 1.2em; }
+        .text-center { text-align: center; }
+
+        /* ─── PART HEADER ─── */
+        .part-header {
+            background-color: #f1f2ec;
+            padding: 15px 20px;
+            border: 1px solid #e0e0e0;
+            text-align: left;
+            margin: 10px 20px;
+            border-radius: 5px;
+        }
+        .part-header p { margin: 0; }
+        .part-header p:first-child { margin-bottom: 5px; }
+
+        /* ─── QUESTIONS ─── */
+        .question { margin-bottom: 40px; }
+        .question p { margin-bottom: 10px; }
+        .question-prompt { margin-bottom: 20px; }
+        .question ul { list-style: none; padding-left: 0; }
+        .question ul li { margin-bottom: 5px; }
+        .question ul li label { display: block; margin-top: 8px; cursor: pointer; }
+        .questions-container { width: 100%; }
+        .hidden { display: none !important; }
+
+        /* ─── DRAG AND DROP STYLES ─── */
+        .drag-options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .drag-item {
+            background: #fff;
+            border: 2px solid #4a90e2;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: grab;
+            font-size: 14px;
+            transition: all 0.2s;
+            user-select: none;
+            font-weight: 500;
+            color: #1a1a2e;
+        }
+
+        .drag-item:hover {
+            background: #e3f2fd;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(74,144,226,0.3);
+        }
+
+        .drag-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .drag-item.used {
+            opacity: 0.4;
+            pointer-events: none;
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .passage-drag-zone {
+            min-width: 250px;
+            padding: 10px 15px;
+            border: 2px dashed #ccc;
+            border-radius: 6px;
+            background: #f9f9f9;
+            text-align: center;
+            margin: 15px 0;
+            transition: all 0.3s;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .passage-drag-zone.drag-over {
+            background: #e3f2fd;
+            border-color: #4a90e2;
+            border-style: solid;
+        }
+
+        .passage-drag-zone.dropped {
+            background: #e8f5e9;
+            border-color: #28a745;
+            border-style: solid;
+        }
+
+        .passage-drag-zone .dropped-item {
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .passage-drag-zone .remove-btn {
+            margin-left: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        /* ─── T/F/NG ─── */
+        .tf-question {
+            margin-bottom: 25px;
+            padding: 10px 0;
+            border-radius: 4px;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        .tf-question-line {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 5px 0;
+            border-radius: 4px;
+        }
+        .tf-question-number {
+            border: 2px solid #ccc;
+            padding: 2px 8px;
+            margin-right: 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            transition: border-color 0.3s;
+            display: inline-block;
+        }
+        .tf-question.active-question .tf-question-number { border-color: #4a90e2; }
+        .tf-question-text { padding-top: 3px; }
+        .tf-options { padding-left: 5px; }
+        .tf-option {
+            display: block;
+            padding: 8px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .tf-option:hover { background-color: #f1f7ff; }
+        .tf-option:has(input:checked) { background-color: #cfe3f9; }
+        .tf-option input[type="radio"] { margin-right: 10px; transform: scale(1.2); accent-color: #4a90e2; }
+        .tf-option.correct { background-color: #d4edda !important; border-color: #28a745 !important; }
+        .tf-option.incorrect { background-color: #f8d7da !important; border-color: #dc3545 !important; }
+        .tf-option.correct-answer-highlight { background-color: #d4edda !important; }
+        .tf-question.correct .tf-question-line { background-color: #e9f7ef; }
+        .tf-question.incorrect .tf-question-line { background-color: #f8d7da; }
+
+        /* ─── MCQ ─── */
+        .multi-choice-question {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 3px solid transparent;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        .multi-choice-question .question-prompt p > strong:first-child {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            padding: 2px 6px;
+            margin-right: 8px;
+            border: 1px solid #d0d7e2;
+            border-radius: 6px;
+            background: #fff;
+        }
+        .multi-choice-question.active-question .question-prompt p > strong:first-child {
+            border-color: #4a90e2;
+            border-width: 2px;
+        }
+        .multi-choice-option {
+            padding: 10px 12px;
+            background-color: #fff;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .multi-choice-option:hover { background-color: #f1f7ff; }
+        .multi-choice-option:has(input:checked) { background-color: #cfe3f9; }
+        .multi-choice-option label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .multi-choice-option input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.3);
+            accent-color: #4a90e2;
+        }
+        .multi-choice-option.correct { background-color: #d4edda !important; border-color: #28a745 !important; border-radius: 6px; }
+        .multi-choice-option.incorrect { background-color: #f8d7da !important; border-color: #dc3545 !important; border-radius: 6px; }
+        .multi-choice-option.correct-answer-highlight { background-color: #d4edda !important; border-color: #28a745 !important; }
+        body.results-mode .multi-choice-option:has(input:checked) { box-shadow: none; }
+
+        /* ─── CORRECT ANSWER DISPLAY ─── */
+        .correct-answer-display { font-size: 14px; }
+        .correct-answer-highlight { color: #28a745; font-weight: 700; }
+
+        /* ─── HIGHLIGHT ─── */
+        .highlight { background-color: #ffff00; }
+        .comment-highlight { background-color: #90EE90; position: relative; cursor: help; }
+        .comment-tooltip {
+            position: absolute;
+            bottom: 100%; left: 50%;
+            transform: translateX(-50%);
+            background: #333; color: white;
+            padding: 8px 12px; border-radius: 4px;
+            font-size: 14px; white-space: nowrap;
+            z-index: 1000; opacity: 0;
+            pointer-events: none; transition: opacity 0.3s;
+        }
+        .comment-highlight:hover .comment-tooltip { opacity: 1; }
+
+        /* ─── CONTEXT MENU ─── */
+        .context-menu {
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000; display: none; min-width: 140px;
+        }
+        .context-menu-item {
+            padding: 12px 16px;
+            cursor: pointer; font-size: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .context-menu-item:hover { background-color: #f8f9fa; }
+        .context-menu-item:last-child { border-bottom: none; }
+
+        /* ─── NOTES MODAL ─── */
+        .notes-modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000; display: none;
+            justify-content: center; align-items: center;
+        }
+        .notes-modal-overlay.active { display: flex; }
+        .notes-modal {
+            background: #fff; border-radius: 10px;
+            padding: 28px 24px 20px;
+            width: 380px; max-width: 95vw;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        .notes-modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #1a1a2e; }
+        .notes-modal textarea {
+            width: 100%; height: 100px;
+            border: 1px solid #ccc; border-radius: 6px;
+            padding: 8px 10px; font-size: 14px; resize: vertical;
+            outline: none;
+        }
+        .notes-modal textarea:focus { border-color: #4a90e2; }
+        .notes-modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+        .notes-modal-btns button {
+            padding: 7px 18px; border-radius: 6px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+        .notes-modal-btns .btn-save { background: #1a1a2e; color: #fff; border: none; }
+        .notes-modal-btns .btn-cancel { background: #fff; color: #444; border: 1px solid #ccc; }
+
+        /* ─── NAVIGATION ARROWS ─── */
+        .nav-arrows {
+            position: fixed; bottom: 100px; right: 20px;
+            display: flex; gap: 6px; z-index: 101;
+        }
+        .nav-arrow {
+            width: 48px; height: 48px;
+            border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 700; color: #fff;
+            transition: transform 0.1s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+            outline: none;
+        }
+        .nav-arrow.prev { background-color: #4b5563; }
+        .nav-arrow.next { background-color: #000000; }
+        .nav-arrow:hover { transform: translateY(-1px); }
+        .nav-arrow:active { transform: translateY(0); }
+        .nav-arrow:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ─── BOTTOM NAV ─── */
+        .nav-row {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #ffffff;
+            padding: 0;
+            display: flex; align-items: center;
+            height: 80px; z-index: 100;
+            border-top: 1px solid #e0e0e0;
+        }
+        .footer__subquestionWrapper___9GgoP {
+            display: flex;
+            gap: 2px;
+            margin-left: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .subQuestion {
+            width: 32px; height: 32px;
+            border: 1px solid #ccc;
+            background: white; color: #333;
+            font-size: 14px; font-weight: 500;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; border-radius: 2px;
+        }
+        .subQuestion.answered { background-color: #e9ecef; border-color: #ddd; }
+        .subQuestion.correct { background-color: #28a745; color: white; border-color: #28a745; }
+        .subQuestion.incorrect { background-color: #dc3545; color: white; border-color: #dc3545; }
+        .subQuestion:hover { background-color: #f0f0f0; border-color: #999; }
+        .subQuestion.active { background-color: #4a90e2; color: white; border-color: #4a90e2; }
+        .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+
+        .footer__deliverButton___3FM07 {
+            margin-left: auto; margin-right: 20px;
+            background-color: #f3f4f6; color: #111827;
+            border: 1px solid #d1d5db;
+            padding: 10px 16px; font-size: 15px; font-weight: 700;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 10px;
+            transition: transform 0.08s, background-color 0.2s, border-color 0.2s;
+            min-width: 160px; justify-content: center;
+        }
+        .footer__deliverButton___3FM07:hover { background-color: #ebedf0; border-color: #c7ccd4; }
+        .footer__deliverButton___3FM07:active { transform: translateY(1px); }
+        .footer__deliverButton___3FM07:disabled { background: #eef0f3; color: #9ca3af; cursor: not-allowed; border-color: #e5e7eb; }
+
+        /* ─── RESULTS MODAL ─── */
+        .results-modal {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 3000; display: flex;
+            justify-content: center; align-items: center;
+        }
+        .results-modal-content {
+            background: white; border-radius: 10px;
+            padding: 30px; max-width: 540px; width: 90%;
+            max-height: 80vh; overflow-y: auto;
+        }
+        .results-modal-content h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+        .result-row {
+            display: flex; gap: 12px;
+            padding: 8px 0; border-bottom: 1px solid #eee;
+            font-size: 14px; align-items: center;
+        }
+        .result-row.incorrect { background-color: #fff5f5; }
+        .result-row .q-num { font-weight: 700; min-width: 30px; }
+        .result-row .user-ans { color: #555; flex: 1; }
+        .result-row .correct-ans { color: #28a745; font-weight: 600; flex: 1; }
+        .results-score { font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 10px; }
+        .results-band { font-size: 16px; text-align: center; color: #666; margin-bottom: 20px; }
+        .close-results-btn {
+            display: block; margin: 20px auto 0;
+            background: #1a1a2e; color: #fff;
+            border: none; border-radius: 6px;
+            padding: 10px 30px; font-size: 15px;
+            font-weight: 700; cursor: pointer;
+        }
+
+        /* ─── PRE-TEST OVERLAY ─── */
+        .pretest-overlay {
+            position: fixed; inset: 0;
+            background: rgba(15,15,30,0.75);
+            z-index: 3000;
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(3px);
+        }
+        .pretest-modal {
+            background: #fff; border-radius: 12px;
+            padding: 40px 36px 32px; max-width: 480px; width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            text-align: center; animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)} }
+        .pretest-modal .modal-logo {
+            font-size: 15px; font-weight: 800;
+            letter-spacing: 1.5px; color: #1a1a2e; margin-bottom: 24px;
+        }
+        .pretest-modal .modal-logo span {
+            background: #1a1a2e; color: #fff;
+            padding: 2px 6px; border-radius: 4px; font-size: 12px;
+        }
+        .pretest-modal h2 { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; }
+        .pretest-modal p { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 28px; }
+        .pretest-modal .exam-note {
+            background: #fff8e1; border: 1px solid #ffe082;
+            border-radius: 8px; padding: 12px 14px;
+            font-size: 13px; color: #795548; margin-bottom: 28px; text-align: left;
+        }
+        .pretest-modal .exam-note strong { color: #e65100; }
+        .pretest-btn-group { display: flex; gap: 12px; justify-content: center; }
+        .pretest-btn {
+            flex: 1; padding: 12px 16px; border-radius: 8px;
+            font-size: 14px; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+        }
+        .pretest-btn.btn-exam { background: #1a1a2e; color: #fff; }
+        .pretest-btn.btn-exam:hover { background: #2d2d4e; }
+        .pretest-btn.btn-practice { background: #fff; color: #1a1a2e; border-color: #ccc; }
+        .pretest-btn.btn-practice:hover { background: #f5f5f5; border-color: #999; }
+
+        * { scrollbar-width: none; -ms-overflow-style: none; }
+        *::-webkit-scrollbar { width: 8px; background: transparent; }
+        *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        *:hover::-webkit-scrollbar-thumb { opacity: 1; }
+    </style>
+</head>
+<body>
+    <!-- ─── PRE-TEST MODE SELECTION MODAL ─── -->
+    <div id="pretest-overlay" class="pretest-overlay">
+        <div class="pretest-modal">
+            <div class="modal-logo">IELTS<span>PRACTICE</span></div>
+            <h2>Choose Your Test Mode</h2>
+            <p>Would you like to take this in a <strong>Real Exam Environment</strong>?</p>
+            <div class="exam-note">
+                <strong>⚠️ Real Exam Mode:</strong> The timer starts immediately and cannot be paused. The test will automatically submit when 20 minutes are up.
+            </div>
+            <div class="pretest-btn-group">
+                <button class="pretest-btn btn-exam" id="btn-exam-mode">Yes — Real Exam Mode</button>
+                <button class="pretest-btn btn-practice" id="btn-practice-mode">No — Practice Mode</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── HEADER ─── -->
+    <div class="header">
+        <div class="header-left">
+            <button class="back-btn" id="back-btn" title="Go back to home">← Back</button>
+            <div class="ielts-logo">
+                <span class="ielts-logo-badge">IELTS</span>PRACTICE
+            </div>
+            <span class="exam-mode-badge" id="exam-mode-badge">Exam Mode</span>
+        </div>
+        <div class="timer-container">
+            <span class="timer-display" id="timer-display">20:00</span>
+            <div class="timer-controls">
+                <button id="timer-toggle-btn" title="Pause/Resume Timer">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M8 5v14l11-7L8 5z"/></svg>
+                </button>
+                <button id="timer-reset-btn" title="Reset Timer">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── MAIN ─── -->
+    <div class="main-container" id="main-container">
+        <div id="passage-header-container">
+            <div id="part-header-3" class="part-header">
+                <p><strong>Reading — Part 3 | Set 3</strong></p>
+                <p>Read the text and answer questions 27–40.</p>
+            </div>
+        </div>
+        <div class="panels-container">
+            <!-- Passage Panel -->
+            <div class="passage-panel" id="passage-panel">
+                <div id="passage-text-3" class="reading-passage">
+                    <h4 class="text-center">Communicating Styles and Conflict</h4>
+
+                    <div class="passage-drag-zone" data-dnd-group="p3-27-34" data-question="27" data-accept="iii">
+                        <span class="placeholder-text">Drag heading here for Section A</span>
+                    </div>
+                    <p><strong>A</strong>&nbsp;&nbsp;As far back as Hippocrates' time (460-370 BC), people have tried to understand other people by characterizing them according to personality type or temperament. Hippocrates believed there were four different body fluids that influenced four basic types of temperament. His work was further developed 500 years later by Galen. These days there are a number of self-assessment tools that relate to the basic descriptions developed by Galen, although we no longer believe the source to be the types of body fluid that dominate our systems.</p>
+
+                    <div class="passage-drag-zone" data-dnd-group="p3-27-34" data-question="28" data-accept="vii">
+                        <span class="placeholder-text">Drag heading here for Section B</span>
+                    </div>
+                    <p><strong>B</strong>&nbsp;&nbsp;The values in self-assessments that help determine personality style. Learning styles, communication styles, conflict-handling styles, or other aspects of individuals is that they help depersonalize conflict in interpersonal relationships.</p>
+                    <p>The depersonalization occurs when you realize that others aren't trying to be difficult, but they need different or more information than you do. They're not intending to be rude: they are so focused on the task they forget about greeting people. They would like to work faster but not at the risk of damaging the relationships needed to get the job done. They understand there is a job to do. But it can only be done right with the appropriate information, which takes time to collect.</p>
+                    <p>When used appropriately, understanding communication styles can help resolve conflict on teams. Very rarely are conflicts true personality issues. Usually they are issues of style, information needs, or focus.</p>
+
+                    <div class="passage-drag-zone" data-dnd-group="p3-27-34" data-question="29" data-accept="i">
+                        <span class="placeholder-text">Drag heading here for Section C</span>
+                    </div>
+                    <p><strong>C</strong>&nbsp;&nbsp;Hippocrates and later Galen determined there were four basic temperaments: sanguine, phlegmatic, melancholic and choleric. These descriptions were developed centuries ago and are still somewhat apt, although you could update the wording. In today's world, they translate into the four fairly common communication styles described below:</p>
+
+                    <div class="passage-drag-zone" data-dnd-group="p3-27-34" data-question="30" data-accept="iv">
+                        <span class="placeholder-text">Drag heading here for Section D</span>
+                    </div>
+                    <p><strong>D</strong>&nbsp;&nbsp;The sanguine person would be the expressive or spirited style of communication. These people speak in pictures. They invest a lot of emotion and energy in their communication and often speak quickly. Putting their whole body into it. They are easily sidetracked onto a story that may or may not illustrate the point they are trying to make. Because of their enthusiasm, they are great team motivators. They are concerned about people and relationships. Their high levels of energy can come on strong at times and their focus is usually on the bigger picture, which means they sometimes miss the details or the proper order of things. These people find conflict or differences of opinion invigorating and love to engage in a spirited discussion. They love change and are constantly looking for new and exciting adventures.</p>
+
+                    <div class="passage-drag-zone" data-dnd-group="p3-27-34" data-question="31" data-accept="ix">
+                        <span class="placeholder-text">Drag heading here for Section E</span>
+                    </div>
+                    <p><strong>E</strong>&nbsp;&nbsp;The phlegmatic person – cool and persevering – translates into the technical or systematic communication style. This style of communication is focused on facts and technical details. Phlegmatic people have an orderly methodical way of approaching tasks, and their focus is very much on the task, not on the people, emotions, or concerns that the task may evoke. The focus is also more on the details necessary to accomplish a task. Sometimes the details overwhelm the big picture and focus needs to be brought back to the context of the task. People with this style think the facts should speak for themselves, and they are not as comfortable with conflict. They need time to adapt to change and need to understand both the logic of it and the steps involved.</p>
+
+                    <div class="passage-drag-zone" data-dnd-group="p3-27-34" data-question="32" data-accept="viii">
+                        <span class="placeholder-text">Drag heading here for Section F</span>
+                    </div>
+                    <p><strong>F</strong>&nbsp;&nbsp;The melancholic person who is soft-hearted and oriented toward doing things for others translates into the considerate or sympathetic communication style. A person with this communication style is focused on people and relationships. They are good listeners and do things for other people – sometimes to the detriment of getting things done for themselves. They want to solicit everyone's opinion and make sure everyone is comfortable with whatever is required to get the job done. At times this focus on others can distract from the task at hand. Because they are so concerned with the needs of others and smoothing over issues, they do not like conflict. They believe that change threatens the status quo and tends to make people feel uneasy, so people with this communication style, like phlegmatic people need time to consider the changes in order to adapt to them.</p>
+
+                    <div class="passage-drag-zone" data-dnd-group="p3-27-34" data-question="33" data-accept="v">
+                        <span class="placeholder-text">Drag heading here for Section G</span>
+                    </div>
+                    <p><strong>G</strong>&nbsp;&nbsp;The choleric temperament translates into the bold or direct style of communication. People with this style are brief in their communication – the fewer words the better. They are big picture thinkers and love to be involved in many things at once. They are focused on tasks and outcomes and often forget that the people involved in carrying out the tasks have needs. They don't do detail work easily and as a result can often underestimate how much time it takes to achieve the task. Because they are so direct, they often seem forceful and can be very intimidating to others. They usually would welcome someone challenging them. But most other styles are afraid to do so. They also thrive on change, the more the better.</p>
+
+                    <div class="passage-drag-zone" data-dnd-group="p3-27-34" data-question="34" data-accept="ii">
+                        <span class="placeholder-text">Drag heading here for Section H</span>
+                    </div>
+                    <p><strong>H</strong>&nbsp;&nbsp;A well-functioning team should have all of these communication styles for true effectiveness. All teams need to focus on the task, and they need to take care of relationships in order to achieve those tasks. They need the big picture perspective or the context of their work, and they need the details to be identified and taken care of for success.</p>
+                    <p>We all have aspects of each style within us. Some of us can easily move from one style to another and adapt our style to the needs of the situation at hand-whether the focus is on tasks or relationships. For others, a dominant style is very evident, and it is more challenging to see the situation from the perspective of another style.</p>
+                    <p>The work environment can influence communication styles either by the type of work that is required or by the predominance of one style reflected in that environment. Some people use one style at work and another at home.</p>
+                    <p>The good news about communication styles is that we have the ability to develop flexibility in our styles. The greater the flexibility we have, the more skilled we usually are at handling possible and actual conflicts. Usually it has to be relevant to us to do so, either because we think it is important or because there are incentives in our environment to encourage it. The key is that we have to want to become flexible with our communication style. As Henry Ford said, "Whether you think you can or you can't, you're right!"</p>
+                </div>
+            </div>
+
+            <!-- Resizer -->
+            <div class="resizer" id="resizer"></div>
+
+            <!-- Questions Panel -->
+            <div class="questions-panel" id="questions-panel">
+                <div id="questions-3" class="question-set">
+                    <div class="questions-container">
+
+                        <!-- Questions 27-34: Heading Matching (Drag & Drop) -->
+                        <div class="question" data-q-start="27" data-q-end="34">
+                            <div class="question-prompt">
+                                <p><strong>Questions 27–34</strong></p>
+                                <p>The text has eight sections, A-H. Choose the correct heading for each section from the list of headings below.</p>
+                                <p><em>Drag the headings to the appropriate section boxes in the passage.</em></p>
+                            </div>
+                            <div class="drag-options-container" data-dnd-group="p3-27-34" id="drag-options-container">
+                                <div class="drag-item" draggable="true" data-value="i">i&nbsp;&nbsp;Summarising personality types</div>
+                                <div class="drag-item" draggable="true" data-value="ii">ii&nbsp;&nbsp;Combined styles for workplace</div>
+                                <div class="drag-item" draggable="true" data-value="iii">iii&nbsp;&nbsp;Physical explanation</div>
+                                <div class="drag-item" draggable="true" data-value="iv">iv&nbsp;&nbsp;A lively person who encourages</div>
+                                <div class="drag-item" draggable="true" data-value="v">v&nbsp;&nbsp;Demanding and unsympathetic personality</div>
+                                <div class="drag-item" draggable="true" data-value="vi">vi&nbsp;&nbsp;Lazy and careless personality</div>
+                                <div class="drag-item" draggable="true" data-value="vii">vii&nbsp;&nbsp;The benefits of understanding communication styles</div>
+                                <div class="drag-item" draggable="true" data-value="viii">viii&nbsp;&nbsp;Cautious and caring</div>
+                                <div class="drag-item" draggable="true" data-value="ix">ix&nbsp;&nbsp;Factual and analytical personality</div>
+                                <div class="drag-item" draggable="true" data-value="x">x&nbsp;&nbsp;Self-assessment determines one's temperament</div>
+                            </div>
+                            <p style="font-size: 13px; color: #666; margin-top: 10px;"><em>Tip: Drag the headings from above to the drop zones in the passage on the left.</em></p>
+                        </div>
+
+                        <!-- Questions 35-39: TRUE/FALSE/NOT GIVEN -->
+                        <div class="question" data-q-start="35" data-q-end="39">
+                            <div class="question-prompt">
+                                <p><strong>Questions 35–39</strong></p>
+                                <p>Do the following statements agree with the information given in the text?</p>
+                                <ul style="list-style: none; padding-left: 0;">
+                                    <li><strong>TRUE</strong> if the statement agrees with the information</li>
+                                    <li><strong>FALSE</strong> if the statement contradicts the information</li>
+                                    <li><strong>NOT GIVEN</strong> if there is no information on this</li>
+                                </ul>
+                            </div>
+                            <div class="tf-question" data-q-start="35" data-q-end="35">
+                                <div class="tf-question-line"><span class="tf-question-number">35</span><span class="tf-question-text">It is believed that sanguine people dislike variety.</span></div>
+                                <div class="tf-options">
+                                    <label class="tf-option"><input type="radio" name="q35" value="TRUE"> TRUE</label>
+                                    <label class="tf-option"><input type="radio" name="q35" value="FALSE"> FALSE</label>
+                                    <label class="tf-option"><input type="radio" name="q35" value="NOT GIVEN"> NOT GIVEN</label>
+                                </div>
+                            </div>
+                            <div class="tf-question" data-q-start="36" data-q-end="36">
+                                <div class="tf-question-line"><span class="tf-question-number">36</span><span class="tf-question-text">Melancholic and phlegmatic people have similar characteristics.</span></div>
+                                <div class="tf-options">
+                                    <label class="tf-option"><input type="radio" name="q36" value="TRUE"> TRUE</label>
+                                    <label class="tf-option"><input type="radio" name="q36" value="FALSE"> FALSE</label>
+                                    <label class="tf-option"><input type="radio" name="q36" value="NOT GIVEN"> NOT GIVEN</label>
+                                </div>
+                            </div>
+                            <div class="tf-question" data-q-start="37" data-q-end="37">
+                                <div class="tf-question-line"><span class="tf-question-number">37</span><span class="tf-question-text">Managers often select their best employees according to personality types.</span></div>
+                                <div class="tf-options">
+                                    <label class="tf-option"><input type="radio" name="q37" value="TRUE"> TRUE</label>
+                                    <label class="tf-option"><input type="radio" name="q37" value="FALSE"> FALSE</label>
+                                    <label class="tf-option"><input type="radio" name="q37" value="NOT GIVEN"> NOT GIVEN</label>
+                                </div>
+                            </div>
+                            <div class="tf-question" data-q-start="38" data-q-end="38">
+                                <div class="tf-question-line"><span class="tf-question-number">38</span><span class="tf-question-text">It is possible to change one's personality type.</span></div>
+                                <div class="tf-options">
+                                    <label class="tf-option"><input type="radio" name="q38" value="TRUE"> TRUE</label>
+                                    <label class="tf-option"><input type="radio" name="q38" value="FALSE"> FALSE</label>
+                                    <label class="tf-option"><input type="radio" name="q38" value="NOT GIVEN"> NOT GIVEN</label>
+                                </div>
+                            </div>
+                            <div class="tf-question" data-q-start="39" data-q-end="39">
+                                <div class="tf-question-line"><span class="tf-question-number">39</span><span class="tf-question-text">Workplace environment can affect which communication style is most effective.</span></div>
+                                <div class="tf-options">
+                                    <label class="tf-option"><input type="radio" name="q39" value="TRUE"> TRUE</label>
+                                    <label class="tf-option"><input type="radio" name="q39" value="FALSE"> FALSE</label>
+                                    <label class="tf-option"><input type="radio" name="q39" value="NOT GIVEN"> NOT GIVEN</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Question 40: Multiple Choice -->
+                        <div class="question" data-q-start="40" data-q-end="40">
+                            <div class="question-prompt">
+                                <p><strong>Question 40</strong></p>
+                                <p>Choose the correct answer.</p>
+                            </div>
+                            <div class="multi-choice-question" data-q-start="40" data-q-end="40">
+                                <div class="question-prompt"><p><strong>40</strong> The writer believes using self-assessment tools can</p></div>
+                                <div class="multi-choice-option"><label><input type="radio" name="q40" value="A"> help to develop one's personality.</label></div>
+                                <div class="multi-choice-option"><label><input type="radio" name="q40" value="B"> help to understand colleagues' behaviour.</label></div>
+                                <div class="multi-choice-option"><label><input type="radio" name="q40" value="C"> improve one's relationship with the employer.</label></div>
+                                <div class="multi-choice-option"><label><input type="radio" name="q40" value="D"> directly resolve conflicts.</label></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── NAVIGATION ARROWS ─── -->
+    <div class="nav-arrows">
+        <button class="nav-arrow prev" id="prev-btn" onclick="previousQuestion()" title="Previous question">&#8592;</button>
+        <button class="nav-arrow next" id="next-btn" onclick="nextQuestion()" title="Next question">&#8594;</button>
+    </div>
+
+    <!-- ─── BOTTOM NAV ─── -->
+    <nav class="nav-row" id="nav-row" role="navigation" aria-label="Question navigation">
+        <div class="footer__subquestionWrapper___9GgoP">
+            <button class="subQuestion scorable-item" onclick="goToQuestion(27)"><span class="sr-only">Question 27</span><span aria-hidden="true">27</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(28)"><span class="sr-only">Question 28</span><span aria-hidden="true">28</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(29)"><span class="sr-only">Question 29</span><span aria-hidden="true">29</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(30)"><span class="sr-only">Question 30</span><span aria-hidden="true">30</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(31)"><span class="sr-only">Question 31</span><span aria-hidden="true">31</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(32)"><span class="sr-only">Question 32</span><span aria-hidden="true">32</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(33)"><span class="sr-only">Question 33</span><span aria-hidden="true">33</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(34)"><span class="sr-only">Question 34</span><span aria-hidden="true">34</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(35)"><span class="sr-only">Question 35</span><span aria-hidden="true">35</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(36)"><span class="sr-only">Question 36</span><span aria-hidden="true">36</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(37)"><span class="sr-only">Question 37</span><span aria-hidden="true">37</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(38)"><span class="sr-only">Question 38</span><span aria-hidden="true">38</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(39)"><span class="sr-only">Question 39</span><span aria-hidden="true">39</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(40)"><span class="sr-only">Question 40</span><span aria-hidden="true">40</span></button>
+        </div>
+        <button id="deliver-button" aria-label="Check your answers" class="footer__deliverButton___3FM07">
+            <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+            <span>Check Answers</span>
+        </button>
+    </nav>
+
+    <!-- ─── CONTEXT MENU ─── -->
+    <div id="contextMenu" class="context-menu">
+        <div class="context-menu-item" id="menu-highlight" onclick="highlightText()">🖊 Highlight</div>
+        <div class="context-menu-item" id="menu-note" onclick="openNoteModal()">📝 Add Note</div>
+        <div class="context-menu-item" id="menu-clear" onclick="clearHighlight()" style="display:none;">🗑 Clear</div>
+        <div class="context-menu-item" id="menu-clear-all" onclick="clearAllHighlights()" style="display:none;">🗑 Clear All</div>
+    </div>
+
+    <!-- ─── NOTE MODAL ─── -->
+    <div id="note-modal" class="notes-modal-overlay">
+        <div class="notes-modal">
+            <h3>📝 Add a Note</h3>
+            <textarea id="note-input" placeholder="Type your note here..."></textarea>
+            <div class="notes-modal-btns">
+                <button class="btn-cancel" onclick="closeNoteModal()">Cancel</button>
+                <button class="btn-save" onclick="saveNote()">Save Note</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── RESULTS MODAL ─── -->
+    <div id="results-modal" class="results-modal hidden">
+        <div class="results-modal-content">
+            <h2>Your Results</h2>
+            <div id="results-score" class="results-score"></div>
+            <div id="results-band" class="results-band"></div>
+            <div style="display:grid;grid-template-columns:40px 1fr 1fr;gap:4px;font-size:12px;font-weight:700;color:#999;padding:4px 0;border-bottom:2px solid #eee;margin-bottom:8px;">
+                <span>#</span><span>Your Answer</span><span>Correct Answer</span>
+            </div>
+            <div id="results-details"></div>
+            <button class="close-results-btn" onclick="closeResultsModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- ─── JAVASCRIPT ─── -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ── CONSTANTS ──────────────────────────────────────────────
+        const TOTAL_QUESTIONS = 14;
+        const TIMER_SECONDS   = 1200; // 20:00
+        const START_Q = 27;
+        const END_Q = 40;
+
+        // ── STATE ──────────────────────────────────────────────────
+        let currentQuestion = START_Q;
+        let timerSeconds    = TIMER_SECONDS;
+        let timerInterval   = null;
+        let isRunning       = false;
+        let isExamMode      = false;
+        let dndAnswers      = {}; // Store drag-and-drop answers
+
+        // ── ANSWER KEY ─────────────────────────────────────────────
+        const correctAnswers = {
+            '27': 'iii',
+            '28': 'vii',
+            '29': 'i',
+            '30': 'iv',
+            '31': 'ix',
+            '32': 'viii',
+            '33': 'v',
+            '34': 'ii',
+            '35': 'FALSE',
+            '36': 'TRUE',
+            '37': 'NOT GIVEN',
+            '38': 'TRUE',
+            '39': 'TRUE',
+            '40': 'B'
+        };
+
+        // ── DOM REFS ───────────────────────────────────────────────
+        const timerDisplay     = document.getElementById('timer-display');
+        const timerToggleBtn   = document.getElementById('timer-toggle-btn');
+        const timerResetBtn    = document.getElementById('timer-reset-btn');
+        const deliverButton    = document.getElementById('deliver-button');
+        const resizer          = document.getElementById('resizer');
+        const passagePanel     = document.getElementById('passage-panel');
+        const questionsPanel   = document.getElementById('questions-panel');
+        const contextMenu      = document.getElementById('contextMenu');
+        const panels           = [passagePanel, questionsPanel];
+
+        // ── TIMER ──────────────────────────────────────────────────
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            const sec = s % 60;
+            return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+        }
+
+        function updateTimerDisplay() {
+            timerDisplay.textContent = formatTime(timerSeconds);
+            if (timerSeconds <= 120) {
+                timerDisplay.classList.add('urgent');
+            } else {
+                timerDisplay.classList.remove('urgent');
+            }
+        }
+
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            timerInterval = setInterval(() => {
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    if (isExamMode) {
+                        checkAnswers();
+                    }
+                    return;
+                }
+                timerSeconds--;
+                updateTimerDisplay();
+            }, 1000);
+            timerToggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            timerToggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M8 5v14l11-7L8 5z"/></svg>';
+        }
+
+        function toggleTimer() {
+            if (isRunning) pauseTimer(); else startTimer();
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timerSeconds = TIMER_SECONDS;
+            updateTimerDisplay();
+        }
+
+        timerToggleBtn.addEventListener('click', toggleTimer);
+        timerResetBtn.addEventListener('click', resetTimer);
+
+        // ── PRE-TEST MODAL ─────────────────────────────────────────
+        document.getElementById('btn-exam-mode').addEventListener('click', () => {
+            isExamMode = true;
+            document.body.classList.add('exam-mode');
+            document.getElementById('pretest-overlay').style.display = 'none';
+            startTimer();
+        });
+        document.getElementById('btn-practice-mode').addEventListener('click', () => {
+            isExamMode = false;
+            document.getElementById('pretest-overlay').style.display = 'none';
+            startTimer();
+        });
+
+        // ── BACK BUTTON ────────────────────────────────────────────
+        document.getElementById('back-btn').addEventListener('click', () => {
+            const leave = confirm('Are you sure you want to quit? Your progress will not be saved.');
+            if (leave) window.location.href = 'index.html';
+        });
+
+        // ── DRAG AND DROP ENGINE ───────────────────────────────────
+        function initDragAndDrop() {
+            const dragItems = document.querySelectorAll('.drag-item');
+            const dropZones = document.querySelectorAll('.passage-drag-zone');
+
+            dragItems.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+                item.addEventListener('dragend', handleDragEnd);
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+                zone.addEventListener('drop', handleDrop);
+            });
+        }
+
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.value);
+            e.dataTransfer.setData('elementId', e.target.textContent);
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            const zone = e.currentTarget;
+            zone.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            const zone = e.currentTarget;
+            zone.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const zone = e.currentTarget;
+            zone.classList.remove('drag-over');
+
+            const droppedValue = e.dataTransfer.getData('text/plain');
+            const questionNum = zone.dataset.question;
+
+            // Update the zone UI
+            zone.innerHTML = `<span class="dropped-item">${droppedValue}</span><button class="remove-btn" onclick="removeDrop('${questionNum}')">×</button>`;
+            zone.classList.add('dropped');
+
+            // Store the answer
+            dndAnswers[questionNum] = droppedValue;
+
+            // Mark the drag item as used
+            const dragItem = document.querySelector(`.drag-item[data-value="${droppedValue}"]`);
+            if (dragItem) {
+                dragItem.classList.add('used');
+                dragItem.setAttribute('draggable', 'false');
+            }
+
+            updateAllIndicators();
+        }
+
+        window.removeDrop = function(questionNum) {
+            const zone = document.querySelector(`.passage-drag-zone[data-question="${questionNum}"]`);
+            const droppedValue = dndAnswers[questionNum];
+
+            if (droppedValue) {
+                // Unmark the drag item
+                const dragItem = document.querySelector(`.drag-item[data-value="${droppedValue}"]`);
+                if (dragItem) {
+                    dragItem.classList.remove('used');
+                    dragItem.setAttribute('draggable', 'true');
+                }
+            }
+
+            // Clear the zone
+            zone.innerHTML = '<span class="placeholder-text">Drag heading here</span>';
+            zone.classList.remove('dropped');
+            delete dndAnswers[questionNum];
+
+            updateAllIndicators();
+        };
+
+        // ── NAVIGATION ─────────────────────────────────────────────
+        function isQuestionAnswered(qNum) {
+            const num = parseInt(qNum);
+            if (num >= 27 && num <= 34) {
+                return dndAnswers[num] !== undefined;
+            }
+            const radioInput = document.querySelector(`input[name="q${qNum}"]:checked`);
+            return radioInput !== null;
+        }
+
+        function updateAllIndicators() {
+            for (let i = START_Q; i <= END_Q; i++) {
+                const btn = document.querySelector(`.subQuestion[onclick="goToQuestion(${i})"]`);
+                if (!btn) continue;
+                if (i === currentQuestion) {
+                    btn.classList.add('active');
+                    btn.classList.remove('answered');
+                } else if (isQuestionAnswered(i)) {
+                    btn.classList.add('answered');
+                    btn.classList.remove('active');
+                } else {
+                    btn.classList.remove('active', 'answered');
+                }
+            }
+            document.getElementById('prev-btn').disabled = currentQuestion <= START_Q;
+            document.getElementById('next-btn').disabled = currentQuestion >= END_Q;
+        }
+
+        function clearActiveQuestion() {
+            document.querySelectorAll('.tf-question.active-question, .multi-choice-question.active-question').forEach(el => {
+                el.classList.remove('active-question');
+            });
+            document.querySelectorAll('.tf-question-number').forEach(el => {
+                el.style.borderColor = '';
+            });
+        }
+
+        function activateQuestion(qNum) {
+            clearActiveQuestion();
+            const tfQ = document.querySelector(`.tf-question[data-q-start="${qNum}"]`);
+            if (tfQ) tfQ.classList.add('active-question');
+            const mcQ = document.querySelector(`.multi-choice-question[data-q-start="${qNum}"]`);
+            if (mcQ) mcQ.classList.add('active-question');
+        }
+
+        function scrollToQuestion(qNum) {
+            const el = document.querySelector(`.tf-question[data-q-start="${qNum}"]`) ||
+                       document.querySelector(`.multi-choice-question[data-q-start="${qNum}"]`) ||
+                       document.querySelector(`.passage-drag-zone[data-question="${qNum}"]`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        window.goToQuestion = function(qNum) {
+            if (qNum < START_Q || qNum > END_Q) return;
+            currentQuestion = qNum;
+            activateQuestion(qNum);
+            scrollToQuestion(qNum);
+            updateAllIndicators();
+        };
+
+        window.nextQuestion = function() {
+            if (currentQuestion < END_Q) goToQuestion(currentQuestion + 1);
+        };
+
+        window.previousQuestion = function() {
+            if (currentQuestion > START_Q) goToQuestion(currentQuestion - 1);
+        };
+
+        // Click on containers to navigate
+        document.querySelectorAll('.tf-question, .multi-choice-question').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const qNum = parseInt(el.dataset.qStart, 10);
+                if (!isNaN(qNum) && qNum !== currentQuestion) goToQuestion(qNum);
+            });
+        });
+
+        // Update indicators on any input change
+        document.body.addEventListener('change', updateAllIndicators);
+
+        // ── CHECK ANSWERS ──────────────────────────────────────────
+        function handleSubmitClick() {
+            const confirmed = confirm('Submit? You will not be able to change your answers.');
+            if (confirmed) checkAnswers();
+        }
+
+        function checkAnswers() {
+            clearInterval(timerInterval);
+            isRunning = false;
+
+            document.querySelectorAll('input, select, textarea').forEach(el => { el.disabled = true; });
+            deliverButton.disabled = true;
+
+            // Disable drag and drop
+            document.querySelectorAll('.drag-item').forEach(item => {
+                item.setAttribute('draggable', 'false');
+            });
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.style.display = 'none';
+            });
+
+            let score = 0;
+            const resultsDetails = document.getElementById('results-details');
+            resultsDetails.innerHTML = '';
+
+            for (let i = START_Q; i <= END_Q; i++) {
+                const key           = String(i);
+                const correctAnswer = correctAnswers[key];
+                let userAnswer      = '';
+                let isCorrect       = false;
+                let displayAnswer   = 'Not Answered';
+
+                if (i >= 27 && i <= 34) {
+                    // Drag and drop questions
+                    userAnswer = dndAnswers[i] || '';
+                    displayAnswer = userAnswer || 'Not Answered';
+                    isCorrect = userAnswer === correctAnswer;
+
+                    // Visual feedback on drop zones
+                    const zone = document.querySelector(`.passage-drag-zone[data-question="${i}"]`);
+                    if (zone) {
+                        if (isCorrect) {
+                            zone.style.background = '#d4edda';
+                            zone.style.borderColor = '#28a745';
+                        } else {
+                            zone.style.background = '#f8d7da';
+                            zone.style.borderColor = '#dc3545';
+                            // Show correct answer
+                            const correctText = document.createElement('div');
+                            correctText.style.fontSize = '12px';
+                            correctText.style.color = '#28a745';
+                            correctText.style.marginTop = '5px';
+                            correctText.textContent = `Correct: ${correctAnswer}`;
+                            zone.appendChild(correctText);
+                        }
+                    }
+                } else {
+                    // Radio button questions
+                    const checkedRadio = document.querySelector(`input[name="q${i}"]:checked`);
+                    if (checkedRadio) {
+                        userAnswer    = checkedRadio.value;
+                        displayAnswer = userAnswer;
+                        isCorrect     = userAnswer === correctAnswer;
+                        const userLabel = checkedRadio.closest('.tf-option, .multi-choice-option');
+                        if (userLabel) userLabel.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    }
+                    if (isCorrect) {
+                        score++;
+                    } else {
+                        const correctEl = document.querySelector(`input[name="q${i}"][value="${correctAnswer}"]`);
+                        if (correctEl) {
+                            const correctLabel = correctEl.closest('.tf-option, .multi-choice-option');
+                            if (correctLabel) correctLabel.classList.add('correct-answer-highlight');
+                        }
+                    }
+                }
+
+                if (isCorrect) score++;
+
+                const btn = document.querySelector(`.subQuestion[onclick="goToQuestion(${i})"]`);
+                if (btn) btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+                const row = document.createElement('div');
+                row.className = 'result-row' + (isCorrect ? '' : ' incorrect');
+                row.style.display = 'grid';
+                row.style.gridTemplateColumns = '40px 1fr 1fr';
+                row.style.gap = '8px';
+                row.style.padding = '6px 0';
+                row.style.borderBottom = '1px solid #eee';
+                row.style.fontSize = '14px';
+                row.innerHTML = `<span style="font-weight:700">${i}</span><span style="color:#555">${displayAnswer || 'Not Answered'}</span><span style="color:#28a745;font-weight:600">${correctAnswer}</span>`;
+                resultsDetails.appendChild(row);
+            }
+
+            const band = getBandFromScore(score, TOTAL_QUESTIONS);
+            document.getElementById('results-score').textContent = `${score} / ${TOTAL_QUESTIONS}`;
+            document.getElementById('results-band').textContent  = `Estimated Band: ${band}`;
+
+            deliverButton.innerHTML = '<span>View Results</span>';
+            deliverButton.disabled  = false;
+            deliverButton.onclick   = () => document.getElementById('results-modal').classList.remove('hidden');
+
+            document.body.classList.add('results-mode');
+            document.getElementById('results-modal').classList.remove('hidden');
+        }
+
+        function getBandFromScore(score, total) {
+            const pct = score / total;
+            if (pct >= 0.90) return 9.0;
+            if (pct >= 0.80) return 8.0;
+            if (pct >= 0.70) return 7.0;
+            if (pct >= 0.60) return 6.0;
+            if (pct >= 0.50) return 5.5;
+            if (pct >= 0.40) return 5.0;
+            return 4.5;
+        }
+
+        window.closeResultsModal = function() {
+            document.getElementById('results-modal').classList.add('hidden');
+        };
+
+        deliverButton.addEventListener('click', handleSubmitClick);
+
+        // ── RESIZER ────────────────────────────────────────────────
+        let isResizing = false;
+        let startX, startLeftWidth;
+
+        resizer.addEventListener('mousedown', (e) => {
+            isResizing    = true;
+            startX        = e.clientX;
+            startLeftWidth = passagePanel.getBoundingClientRect().width;
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            const containerWidth = passagePanel.parentElement.getBoundingClientRect().width;
+            const newLeftWidth   = startLeftWidth + (e.clientX - startX);
+            const minW = 200, maxW = containerWidth - 200 - 16;
+            if (newLeftWidth >= minW && newLeftWidth <= maxW) {
+                passagePanel.style.flex  = 'none';
+                passagePanel.style.width = `${newLeftWidth}px`;
+                questionsPanel.style.flex  = 'none';
+                questionsPanel.style.width = `${containerWidth - newLeftWidth - 16}px`;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isResizing) {
+                isResizing = false;
+                document.body.style.cursor    = '';
+                document.body.style.userSelect = '';
+            }
+        });
+
+        // Touch support
+        resizer.addEventListener('touchstart', (e) => {
+            isResizing    = true;
+            startX        = e.touches[0].clientX;
+            startLeftWidth = passagePanel.getBoundingClientRect().width;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isResizing) return;
+            const containerWidth = passagePanel.parentElement.getBoundingClientRect().width;
+            const newLeftWidth   = startLeftWidth + (e.touches[0].clientX - startX);
+            const minW = 200, maxW = containerWidth - 200 - 16;
+            if (newLeftWidth >= minW && newLeftWidth <= maxW) {
+                passagePanel.style.flex  = 'none';
+                passagePanel.style.width = `${newLeftWidth}px`;
+                questionsPanel.style.flex  = 'none';
+                questionsPanel.style.width = `${containerWidth - newLeftWidth - 16}px`;
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', () => { isResizing = false; });
+
+        // ── CONTEXT MENU (Highlight / Note / Clear) ────────────────
+        let selectedRange          = null;
+        let targetElementForClear  = null;
+
+        document.addEventListener('selectionchange', () => {
+            const sel = window.getSelection();
+            if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+                const range = sel.getRangeAt(0);
+                if (panels.some(p => p.contains(range.commonAncestorContainer))) {
+                    selectedRange = range;
+                    targetElementForClear = null;
+                }
+            }
+        });
+
+        panels.forEach(panel => {
+            panel.addEventListener('contextmenu', (e) => {
+                const target          = e.target;
+                const onHighlight     = target.closest('.highlight, .comment-highlight');
+                const selectionActive = selectedRange && selectedRange.toString().trim().length > 0;
+                let showMenu = false;
+
+                if (onHighlight) {
+                    document.getElementById('menu-highlight').style.display  = 'none';
+                    document.getElementById('menu-note').style.display       = 'none';
+                    document.getElementById('menu-clear').style.display      = 'block';
+                    document.getElementById('menu-clear-all').style.display  = 'block';
+                    contextMenu.targetElementForClear = onHighlight;
+                    showMenu = true;
+                } else if (selectionActive && panels.some(p => p.contains(selectedRange.commonAncestorContainer))) {
+                    document.getElementById('menu-highlight').style.display  = 'flex';
+                    document.getElementById('menu-note').style.display       = 'flex';
+                    document.getElementById('menu-clear').style.display      = 'none';
+                    document.getElementById('menu-clear-all').style.display  = 'block';
+                    showMenu = true;
+                }
+
+                if (showMenu) {
+                    e.preventDefault();
+                    contextMenu.style.display = 'block';
+                    const mH = contextMenu.offsetHeight;
+                    const mW = contextMenu.offsetWidth;
+                    let left = e.pageX, top = e.pageY - mH - 5;
+                    if (left + mW > window.innerWidth) left = window.innerWidth - mW - 5;
+                    if (top < 0) top = e.pageY + 5;
+                    contextMenu.style.left = `${left}px`;
+                    contextMenu.style.top  = `${top}px`;
+                }
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (contextMenu.style.display === 'block' && !contextMenu.contains(e.target)) {
+                closeContextMenu();
+            }
+        });
+
+        function closeContextMenu() {
+            contextMenu.style.display = 'none';
+            selectedRange = null;
+        }
+
+        function unwrapElement(el) {
+            const parent = el.parentNode;
+            if (!parent) return;
+            while (el.firstChild) parent.insertBefore(el.firstChild, el);
+            parent.removeChild(el);
+            parent.normalize();
+        }
+
+        window.highlightText = function() {
+            if (selectedRange && !selectedRange.collapsed) {
+                const span = document.createElement('span');
+                span.className = 'highlight';
+                span.appendChild(selectedRange.extractContents());
+                selectedRange.insertNode(span);
+            }
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        window.clearHighlight = function() {
+            const el = contextMenu.targetElementForClear;
+            if (el) unwrapElement(el);
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        window.clearAllHighlights = function() {
+            document.querySelectorAll('.highlight, .comment-highlight').forEach(unwrapElement);
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        // ── NOTE MODAL ─────────────────────────────────────────────
+        window.openNoteModal = function() {
+            contextMenu.style.display = 'none';
+            document.getElementById('note-modal').classList.add('active');
+            document.getElementById('note-input').focus();
+        };
+
+        window.closeNoteModal = function() {
+            document.getElementById('note-modal').classList.remove('active');
+            document.getElementById('note-input').value = '';
+            selectedRange = null;
+            window.getSelection().removeAllRanges();
+        };
+
+        window.saveNote = function() {
+            const noteText = document.getElementById('note-input').value.trim();
+            if (noteText && selectedRange && !selectedRange.collapsed) {
+                const span    = document.createElement('span');
+                span.className = 'comment-highlight';
+                const tooltip = document.createElement('span');
+                tooltip.className = 'comment-tooltip';
+                tooltip.textContent = noteText;
+                span.appendChild(selectedRange.extractContents());
+                span.appendChild(tooltip);
+                selectedRange.insertNode(span);
+            }
+            closeNoteModal();
+        };
+
+        // ── INIT ───────────────────────────────────────────────────
+        updateTimerDisplay();
+        initDragAndDrop();
+        goToQuestion(START_Q);
+
+    }); // end DOMContentLoaded
+    </script>
+</body>
+</html>

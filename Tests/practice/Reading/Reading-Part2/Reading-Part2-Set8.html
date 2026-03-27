@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading — Part 2 | Set 5 | IELTSPRACTICE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            line-height: 1.4;
+            font-size: 16px;
+        }
+
+        .header {
+            background-color: #ffffff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            height: 60px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .ielts-logo {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #1a1a2e;
+            text-decoration: none;
+            gap: 6px;
+        }
+
+        .ielts-logo-badge {
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .back-btn {
+            background: none;
+            border: 1.5px solid #ccc;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .back-btn:hover { background: #f5f5f5; border-color: #999; }
+
+        .exam-mode-badge {
+            display: none;
+            background: #dc3545;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 99px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        body.exam-mode .exam-mode-badge { display: inline-flex; align-items: center; gap: 4px; }
+        body.exam-mode .exam-mode-badge::before {
+            content: '';
+            display: inline-block;
+            width: 7px; height: 7px;
+            background: #fff;
+            border-radius: 50%;
+            animation: blink 1.2s infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.2} }
+        body.exam-mode #timer-toggle-btn,
+        body.exam-mode #timer-reset-btn { display: none !important; }
+
+        .header-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            letter-spacing: 0.3px;
+        }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+        .timer-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 15px;
+        }
+        .timer-controls button {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            padding: 0;
+            cursor: pointer;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            transition: background-color 0.2s;
+        }
+        .timer-controls button:hover { background: #e0e0e0; }
+        .timer-controls button svg { width: 20px; height: 20px; fill: #333; }
+        body.exam-mode .timer-display.urgent { color: #dc3545; font-weight: 700; }
+
+        .main-container {
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            height: calc(100vh - 60px);
+            position: relative;
+        }
+
+        .panels-container { display: flex; flex: 1; overflow: hidden; }
+
+        .passage-panel {
+            flex: 1;
+            padding: 20px 20px 100px;
+            overflow-y: auto;
+            min-width: 200px;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .passage-panel::-webkit-scrollbar { width: 8px; background: transparent; }
+        .passage-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+
+        .questions-panel {
+            flex: 1;
+            padding: 20px 20px 100px;
+            overflow-y: auto;
+            min-width: 200px;
+            border-left: 1px solid #e0e0e0;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .questions-panel::-webkit-scrollbar { width: 8px; background: transparent; }
+        .questions-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+
+        /* Resizer */
+        .resizer {
+            position: relative;
+            background: transparent;
+            cursor: col-resize;
+            flex-shrink: 0; flex-grow: 0;
+            z-index: 5;
+            width: 16px;
+            touch-action: none;
+            -webkit-user-select: none; user-select: none;
+        }
+        .resizer::before {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0; left: 50%;
+            width: 3px;
+            transform: translateX(-50%);
+            background-color: #3e3e3e;
+        }
+        .resizer::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 36px; height: 36px;
+            background-color: #ffffff;
+            border: 2px solid #3e3e3e;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="%233e3e3e" fill="%233e3e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><line x1="4" y1="12" x2="20" y2="12"/></svg>');
+            background-repeat: no-repeat;
+            background-size: 60% 60%;
+            background-position: center;
+            pointer-events: none;
+        }
+
+        /* Passage */
+        .reading-passage h4 { font-size: 20px; font-weight: bold; margin-bottom: 15px; text-align: center; }
+        .reading-passage p { margin-bottom: 1.2em; }
+        .text-center { text-align: center; }
+
+        /* Part header */
+        .part-header {
+            background-color: #f1f2ec;
+            padding: 15px 20px;
+            border: 1px solid #e0e0e0;
+            text-align: left;
+            margin: 10px 20px;
+            border-radius: 5px;
+        }
+        .part-header p { margin: 0; }
+        .part-header p:first-child { margin-bottom: 5px; }
+
+        /* Questions */
+        .question { margin-bottom: 40px; }
+        .question p { margin-bottom: 10px; }
+        .question-prompt { margin-bottom: 20px; }
+        .question ul { list-style: none; padding-left: 0; }
+        .question ul li { margin-bottom: 5px; }
+        .questions-container { width: 100%; }
+        .hidden { display: none !important; }
+
+        /* True/False/Not Given */
+        .tf-question {
+            margin-bottom: 6px;
+            border-radius: 4px;
+            border: 3px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .tf-question.active-question { border-color: #4a90e2; background-color: #f0f7ff; }
+        .tf-question-line {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 10px 6px 10px;
+        }
+        .tf-question-number {
+            display: inline-flex;
+            align-items: center; justify-content: center;
+            min-width: 28px; height: 28px;
+            border: 1px solid #d0d7e2;
+            border-radius: 6px;
+            background: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            color: #333;
+            flex-shrink: 0;
+        }
+        .tf-question.active-question .tf-question-number { border-color: #4a90e2; border-width: 2px; }
+        .tf-question-text { font-size: 16px; line-height: 1.5; padding-top: 4px; }
+        .tf-options { padding: 0 10px 10px 50px; display: flex; flex-direction: column; gap: 2px; }
+        .tf-option {
+            padding: 10px 12px;
+            background-color: #fff;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .tf-option:hover { background-color: #f1f7ff; }
+        .tf-option:has(input:checked) { background-color: #cfe3f9; }
+        .tf-option label { display: flex; align-items: center; cursor: pointer; font-size: 16px; gap: 10px; }
+        .tf-option input[type="radio"] { transform: scale(1.3); accent-color: #4a90e2; cursor: pointer; }
+        .tf-option.correct { background-color: #d4edda !important; border-radius: 6px; }
+        .tf-option.incorrect { background-color: #f8d7da !important; border-radius: 6px; }
+        .tf-option.correct-answer-highlight { background-color: #d4edda !important; }
+        body.results-mode .tf-option:has(input:checked) { box-shadow: none; }
+
+        /* Answer inputs (Q18–26) */
+        .answer-input {
+            border: 1.5px solid #bbb;
+            border-radius: 4px;
+            background-color: #fff;
+            padding: 3px 8px;
+            font-size: 15px;
+            font-weight: 600;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            height: 30px;
+            min-width: 140px;
+            outline: none;
+            vertical-align: middle;
+        }
+        .answer-input:focus { border-color: #4a90e2; box-shadow: 0 0 0 2px rgba(74,144,226,0.15); }
+        .answer-input.active-input { border-color: #4a90e2; box-shadow: 0 0 0 2px rgba(74,144,226,0.2); }
+        .answer-input::placeholder { color: #bbb; font-weight: 400; font-size: 13px; }
+        .answer-input.correct { border-color: #28a745; background-color: #e9f7ef; }
+        .answer-input.incorrect { border-color: #dc3545; background-color: #f8d7da; color: #721c24; }
+
+        /* Correct answer display */
+        .correct-answer-display { font-size: 13px; margin-left: 6px; }
+        .correct-answer-highlight-text { color: #28a745; font-weight: 700; }
+
+        /* Notes completion (Q18–23) */
+        .notes-completion-container { margin-top: 10px; }
+        .notes-completion-image { width: 100%; border-radius: 6px; margin-bottom: 16px; display: block; }
+        .note-item { padding: 10px 0; border-bottom: 1px solid #f0f0f0; line-height: 1.8; font-size: 16px; }
+        .note-item:last-child { border-bottom: none; }
+        .note-item p { margin: 0; }
+
+        /* Short answer (Q24–26) */
+        .short-answer-container { margin-top: 10px; }
+        .short-answer-item {
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+            border-radius: 4px;
+            border: 3px solid transparent;
+            transition: border-color 0.3s;
+        }
+        .short-answer-item.active-question { border-color: #4a90e2; background-color: #f0f7ff; padding: 12px; }
+        .short-answer-item:last-child { border-bottom: none; }
+        .short-answer-item p { margin: 0 0 8px 0; font-size: 16px; line-height: 1.5; }
+
+        /* Highlights */
+        .highlight { background-color: #ffff00; }
+        .comment-highlight { background-color: #90EE90; position: relative; cursor: help; }
+        .comment-tooltip {
+            position: absolute; bottom: 100%; left: 50%;
+            transform: translateX(-50%);
+            background: #333; color: white;
+            padding: 8px 12px; border-radius: 4px;
+            font-size: 14px; white-space: nowrap;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .comment-highlight:hover .comment-tooltip { opacity: 1; }
+
+        /* Context Menu */
+        .context-menu {
+            position: absolute;
+            background: white; border: 1px solid #ccc;
+            border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000; display: none; min-width: 140px;
+        }
+        .context-menu-item {
+            padding: 12px 16px; cursor: pointer; font-size: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .context-menu-item:hover { background-color: #f8f9fa; }
+        .context-menu-item:last-child { border-bottom: none; }
+
+        /* Notes Modal */
+        .notes-modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000; display: none;
+            justify-content: center; align-items: center;
+        }
+        .notes-modal-overlay.active { display: flex; }
+        .notes-modal {
+            background: #fff; border-radius: 10px;
+            padding: 28px 24px 20px;
+            width: 380px; max-width: 95vw;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        .notes-modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; color: #1a1a2e; }
+        .notes-modal textarea {
+            width: 100%; height: 100px;
+            border: 1px solid #ccc; border-radius: 6px;
+            padding: 8px 10px; font-size: 14px; resize: vertical; outline: none;
+        }
+        .notes-modal textarea:focus { border-color: #4a90e2; }
+        .notes-modal-btns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+        .notes-modal-btns button { padding: 7px 18px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .notes-modal-btns .btn-save { background: #1a1a2e; color: #fff; border: none; }
+        .notes-modal-btns .btn-cancel { background: #fff; color: #444; border: 1px solid #ccc; }
+
+        /* Navigation Arrows */
+        .nav-arrows { position: fixed; bottom: 100px; right: 20px; display: flex; gap: 6px; z-index: 101; }
+        .nav-arrow {
+            width: 48px; height: 48px; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 700; color: #fff;
+            transition: transform 0.1s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25); outline: none;
+        }
+        .nav-arrow.prev { background-color: #4b5563; }
+        .nav-arrow.next { background-color: #000000; }
+        .nav-arrow:hover { transform: translateY(-1px); }
+        .nav-arrow:active { transform: translateY(0); }
+        .nav-arrow:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Bottom Nav */
+        .nav-row {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #ffffff; padding: 0;
+            display: flex; align-items: center;
+            height: 80px; z-index: 100;
+            border-top: 1px solid #e0e0e0;
+        }
+        .footer__subquestionWrapper___9GgoP {
+            display: flex; gap: 2px; margin-left: 16px;
+            flex-wrap: wrap; align-items: center;
+        }
+        .subQuestion {
+            width: 32px; height: 32px;
+            border: 1px solid #ccc; background: white; color: #333;
+            font-size: 14px; font-weight: 500; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; border-radius: 2px;
+        }
+        .subQuestion.answered { background-color: #e9ecef; border-color: #ddd; }
+        .subQuestion.correct { background-color: #28a745; color: white; border-color: #28a745; }
+        .subQuestion.incorrect { background-color: #dc3545; color: white; border-color: #dc3545; }
+        .subQuestion:hover { background-color: #f0f0f0; border-color: #999; }
+        .subQuestion.active { background-color: #4a90e2; color: white; border-color: #4a90e2; }
+        .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+
+        .footer__deliverButton___3FM07 {
+            margin-left: auto; margin-right: 20px;
+            background-color: #f3f4f6; color: #111827;
+            border: 1px solid #d1d5db;
+            padding: 10px 16px; font-size: 15px; font-weight: 700;
+            cursor: pointer;
+            display: inline-flex; align-items: center; gap: 10px;
+            transition: transform 0.08s, background-color 0.2s, border-color 0.2s;
+            min-width: 160px; justify-content: center;
+        }
+        .footer__deliverButton___3FM07:hover { background-color: #ebedf0; border-color: #c7ccd4; }
+        .footer__deliverButton___3FM07:active { transform: translateY(1px); }
+        .footer__deliverButton___3FM07:disabled { background: #eef0f3; color: #9ca3af; cursor: not-allowed; border-color: #e5e7eb; }
+
+        /* Results Modal */
+        .results-modal {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 3000; display: flex;
+            justify-content: center; align-items: center;
+        }
+        .results-modal-content {
+            background: white; border-radius: 10px;
+            padding: 30px; max-width: 540px; width: 90%;
+            max-height: 80vh; overflow-y: auto;
+        }
+        .results-modal-content h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+        .results-score { font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 10px; }
+        .results-band { font-size: 16px; text-align: center; color: #666; margin-bottom: 20px; }
+        .close-results-btn {
+            display: block; margin: 20px auto 0;
+            background: #1a1a2e; color: #fff;
+            border: none; border-radius: 6px;
+            padding: 10px 30px; font-size: 15px; font-weight: 700; cursor: pointer;
+        }
+
+        /* Pre-test overlay */
+        .pretest-overlay {
+            position: fixed; inset: 0;
+            background: rgba(15,15,30,0.75);
+            z-index: 3000;
+            display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(3px);
+        }
+        .pretest-modal {
+            background: #fff; border-radius: 12px;
+            padding: 40px 36px 32px; max-width: 480px; width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            text-align: center; animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp { from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)} }
+        .pretest-modal .modal-logo { font-size: 15px; font-weight: 800; letter-spacing: 1.5px; color: #1a1a2e; margin-bottom: 24px; }
+        .pretest-modal .modal-logo span { background: #1a1a2e; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+        .pretest-modal h2 { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 12px; }
+        .pretest-modal p { font-size: 14px; color: #555; line-height: 1.6; margin-bottom: 28px; }
+        .pretest-modal .exam-note {
+            background: #fff8e1; border: 1px solid #ffe082;
+            border-radius: 8px; padding: 12px 14px;
+            font-size: 13px; color: #795548; margin-bottom: 28px; text-align: left;
+        }
+        .pretest-modal .exam-note strong { color: #e65100; }
+        .pretest-btn-group { display: flex; gap: 12px; justify-content: center; }
+        .pretest-btn { flex: 1; padding: 12px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+        .pretest-btn.btn-exam { background: #1a1a2e; color: #fff; }
+        .pretest-btn.btn-exam:hover { background: #2d2d4e; }
+        .pretest-btn.btn-practice { background: #fff; color: #1a1a2e; border-color: #ccc; }
+        .pretest-btn.btn-practice:hover { background: #f5f5f5; border-color: #999; }
+
+        * { scrollbar-width: none; -ms-overflow-style: none; }
+        *::-webkit-scrollbar { width: 8px; background: transparent; }
+        *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        *:hover::-webkit-scrollbar-thumb { opacity: 1; }
+    </style>
+</head>
+<body>
+    <!-- Pre-Test Mode Selection Modal -->
+    <div id="pretest-overlay" class="pretest-overlay">
+        <div class="pretest-modal">
+            <div class="modal-logo">IELTS<span>PRACTICE</span></div>
+            <h2>Choose Your Test Mode</h2>
+            <p>Would you like to take this in a <strong>Real Exam Environment</strong>?</p>
+            <div class="exam-note">
+                <strong>⚠️ Real Exam Mode:</strong> The timer starts immediately and cannot be paused. The test will automatically submit when 20 minutes are up.
+            </div>
+            <div class="pretest-btn-group">
+                <button class="pretest-btn btn-exam" id="btn-exam-mode">Yes — Real Exam Mode</button>
+                <button class="pretest-btn btn-practice" id="btn-practice-mode">No — Practice Mode</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <button class="back-btn" id="back-btn">← Back</button>
+            <div class="ielts-logo"><span class="ielts-logo-badge">IELTS</span>PRACTICE</div>
+            <span class="exam-mode-badge" id="exam-mode-badge">Exam Mode</span>
+        </div>
+        <div class="header-center">Reading — Part 2 | Set 5</div>
+        <div class="timer-container">
+            <span class="timer-display" id="timer-display">20:00</span>
+            <div class="timer-controls">
+                <button id="timer-toggle-btn" title="Pause/Resume Timer">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M8 5v14l11-7L8 5z"/></svg>
+                </button>
+                <button id="timer-reset-btn" title="Reset Timer">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main-container" id="main-container">
+        <div id="passage-header-container">
+            <div class="part-header">
+                <p><strong>Reading — Part 2 | Set 5</strong></p>
+                <p>Read the text and answer questions 14–26.</p>
+            </div>
+        </div>
+        <div class="panels-container">
+
+            <!-- ── PASSAGE PANEL ── -->
+            <div class="passage-panel" id="passage-panel">
+                <div class="reading-passage">
+                    <h4 class="text-center">Ancient Chinese Chariots</h4>
+                    <p>The Shang Dynasty or Yin Dynasty, according to traditional historiography, ruled in the Yellow River valley in the second millennium BC. Archaeological work at the Ruins of Yin (near modern-day Anyang), which has been identified as the last Shang capital, uncovered eleven major Yin royal tombs and the foundations of palaces and ritual sites, containing weapons of war and remains from both animal and human sacrifices.</p>
+                    <p>The Tomb of Fu Hao is an archaeological site at Yinxu, the ruins of the ancient Shang Dynasty capital Yin, within the modern city of Anyang in Henan Province, China. Discovered in 1976, it was identified as the final resting place of the queen and military general Fu Hao. The artefacts unearthed within the grave included jade objects, bone objects, bronze objects etc. These grave goods are confirmed by the oracle texts, which constitute almost all of the first hand written record we possess of the Shang Dynasty. Below the corpse was a small pit holding the remains of six sacrificial dogs and along the edge lay the skeletons of human slaves, evidence of human sacrifice.</p>
+                    <p>The Terracotta Army was discovered on 29 March 1974 to the east of Xi'an in Shaanxi. The terracotta soldiers were accidentally discovered when a group of local farmers was digging a well during a drought around 1.6 km (1 mile) east of the Qin Emperors tomb around at Mount Li (Lishan), a region riddled with underground springs and watercourses. Experts currently place the entire number of soldiers at 8,000 – with 130 chariots (130 cm long), 530 horses and 150 cavalry horses helping to ward off any dangers in the afterlife. In contrast, the burial of Tutankhamun yielded six complete but dismantled chariots of unparalleled richness and sophistication. Each was designed for two people (90 cm long) and had its axle sawn through to enable it to be brought along the narrow corridor into the tomb.</p>
+                    <p>Excavation of ancient Chinese chariots has confirmed the descriptions of them in the earliest texts. Wheels were constructed from a variety of woods: elm provided the hub, rose-wood the spokes and oak the felloes. The hub was drilled through to form an empty space into which the tampering axle was fitted, the whole being covered with leather to retain lubricating oil. Though the number of spokes varied, a wheel by the fourth century BC usually had eighteen to thirty-two of them. Records show how elaborate was the testing of each completed wheel: flotation and weighing were regarded as the best measures of balance, but even the empty spaces in the assembly were checked with millet grains. One outstanding constructional asset of the ancient Chinese wheel was dishing. Dishing refers to the dish-like shape of an advanced wooden wheel, which looks rather like a flat cone. On occasion they chose to strengthen a dished wheel with a pair of struts running from rim to rim on each of the hub. As these extra supports were inserted separately into the felloes, they would have added even greater strength to the wheel. Leather wrapped up the edge of the wheel aimed to retain bronze.</p>
+                    <p>Within a millennium, however, Chinese chariot-makers had developed a vehicle with shafts, the precursor of the true carriage or cart. This design did not make its appearance in Europe until the end of the Roman Empire. Because the shafts curved upwards, and the harness pressed against a horse's shoulders, not his neck, the shaft chariot was incredibly efficient. The halberd was also part of a chariot standard weaponry. This halberd usually measured well over 3 meters in length, which meant that a chariot warrior wielding it sideways could strike down the charioteer in a passing chariot. The speed of chariot which was tested on the sand was quite fast. At speed these passes were very dangerous for the crews of both chariots.</p>
+                    <p>The advantages offered by the new chariots were not entirely missed. They could see how there were literally the Warring States, whose conflicts lasted down the Qin unification of China. Qin Shi Huang was buried in the most opulent tomb complex ever constructed in China, a sprawling, city-size collection of underground caverns containing everything the emperor would need for the afterlife. Even a collection of terracotta armies called Terra-Cotta Warriors was buried in it. The ancient Chinese, along with many cultures including ancient Egyptians, believed that items and even people buried with a person could be taken with him to the afterlife.</p>
+                </div>
+            </div>
+
+            <!-- Resizer -->
+            <div class="resizer" id="resizer"></div>
+
+            <!-- ── QUESTIONS PANEL ── -->
+            <div class="questions-panel" id="questions-panel">
+                <div class="questions-container">
+
+                    <!-- Q14–17: True / False / Not Given -->
+                    <div class="question" data-q-start="14" data-q-end="17">
+                        <div class="question-prompt">
+                            <p><strong>Questions 14–17</strong></p>
+                            <p>Do the following statements agree with the information in the text?</p>
+                            <ul>
+                                <li><strong>TRUE</strong> if the statement is true</li>
+                                <li><strong>FALSE</strong> if the statement is false</li>
+                                <li><strong>NOT GIVEN</strong> if the information is not given in the passage</li>
+                            </ul>
+                        </div>
+
+                        <div class="tf-question" data-q-start="14" data-q-end="14">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">14</span>
+                                <span class="tf-question-text">When Tomb of Fu Hao was discovered, the written records of the grave goods proved to be accurate.</span>
+                            </div>
+                            <div class="tf-options">
+                                <div class="tf-option"><label><input type="radio" name="q14" value="TRUE"> TRUE</label></div>
+                                <div class="tf-option"><label><input type="radio" name="q14" value="FALSE"> FALSE</label></div>
+                                <div class="tf-option"><label><input type="radio" name="q14" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                        </div>
+
+                        <div class="tf-question" data-q-start="15" data-q-end="15">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">15</span>
+                                <span class="tf-question-text">Human skeletons in Anyang tomb were identified as soldiers who were killed in the war.</span>
+                            </div>
+                            <div class="tf-options">
+                                <div class="tf-option"><label><input type="radio" name="q15" value="TRUE"> TRUE</label></div>
+                                <div class="tf-option"><label><input type="radio" name="q15" value="FALSE"> FALSE</label></div>
+                                <div class="tf-option"><label><input type="radio" name="q15" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                        </div>
+
+                        <div class="tf-question" data-q-start="16" data-q-end="16">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">16</span>
+                                <span class="tf-question-text">The Terracotta Army was discovered by people lived nearby by chance.</span>
+                            </div>
+                            <div class="tf-options">
+                                <div class="tf-option"><label><input type="radio" name="q16" value="TRUE"> TRUE</label></div>
+                                <div class="tf-option"><label><input type="radio" name="q16" value="FALSE"> FALSE</label></div>
+                                <div class="tf-option"><label><input type="radio" name="q16" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                        </div>
+
+                        <div class="tf-question" data-q-start="17" data-q-end="17">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">17</span>
+                                <span class="tf-question-text">The size of the King Tutankhamun's tomb is bigger than that of in Qin Emperors' tomb.</span>
+                            </div>
+                            <div class="tf-options">
+                                <div class="tf-option"><label><input type="radio" name="q17" value="TRUE"> TRUE</label></div>
+                                <div class="tf-option"><label><input type="radio" name="q17" value="FALSE"> FALSE</label></div>
+                                <div class="tf-option"><label><input type="radio" name="q17" value="NOT GIVEN"> NOT GIVEN</label></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q18–23: Notes Completion -->
+                    <div class="question" data-q-start="18" data-q-end="23">
+                        <div class="question-prompt">
+                            <p><strong>Questions 18–23</strong></p>
+                            <p>Complete the notes below.</p>
+                            <p>Write <strong>NO MORE THAN TWO WORDS AND/OR A NUMBER</strong> from the text for each answer.</p>
+                        </div>
+                        <div class="notes-completion-container">
+                            <img src="https://ieltstrainingonline.com/wp-content/uploads/2022/01/Q-14-26-Ancient-Chinese-Chariots-980x466.jpg" alt="Ancient Chinese Chariots diagram" class="notes-completion-image">
+                            <div class="note-item" data-q-start="18" data-q-end="18">
+                                <p><strong>18</strong>&nbsp; The hub is made wood from the tree of &nbsp;<input type="text" class="answer-input" id="q18" placeholder="18"></p>
+                            </div>
+                            <div class="note-item" data-q-start="19" data-q-end="19">
+                                <p><strong>19</strong>&nbsp; The room through the hub was to put tempered axle, which is wrapped up by leather, aiming to retain &nbsp;<input type="text" class="answer-input" id="q19" placeholder="19"></p>
+                            </div>
+                            <div class="note-item" data-q-start="20" data-q-end="20">
+                                <p><strong>20</strong>&nbsp; The number of spokes varied from &nbsp;<input type="text" class="answer-input" id="q20" placeholder="20"></p>
+                            </div>
+                            <div class="note-item" data-q-start="21" data-q-end="21">
+                                <p><strong>21</strong>&nbsp; The shape of wheel resembles a &nbsp;<input type="text" class="answer-input" id="q21" placeholder="21"></p>
+                            </div>
+                            <div class="note-item" data-q-start="22" data-q-end="22">
+                                <p><strong>22</strong>&nbsp; Two &nbsp;<input type="text" class="answer-input" id="q22" placeholder="22">&nbsp; was used to strengthen the wheel.</p>
+                            </div>
+                            <div class="note-item" data-q-start="23" data-q-end="23">
+                                <p><strong>23</strong>&nbsp; The edge of the wheel was wrapped up by leather aiming to retain &nbsp;<input type="text" class="answer-input" id="q23" placeholder="23"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q24–26: Short Answer -->
+                    <div class="question" data-q-start="24" data-q-end="26">
+                        <div class="question-prompt">
+                            <p><strong>Questions 24–26</strong></p>
+                            <p>Answer the questions below.</p>
+                            <p>Write <strong>NO MORE THAN THREE WORDS AND/OR A NUMBER</strong> from the text for each answer.</p>
+                        </div>
+                        <div class="short-answer-container">
+                            <div class="short-answer-item" data-q-start="24" data-q-end="24">
+                                <p><strong>24.</strong> What body part of the horse was released the pressure from to the horse shoulder after the appearance of the shafts?</p>
+                                <input type="text" class="answer-input" id="q24" placeholder="24">
+                            </div>
+                            <div class="short-answer-item" data-q-start="25" data-q-end="25">
+                                <p><strong>25.</strong> What kind of road surface did the researchers measure the speed of the chariot on?</p>
+                                <input type="text" class="answer-input" id="q25" placeholder="25">
+                            </div>
+                            <div class="short-answer-item" data-q-start="26" data-q-end="26">
+                                <p><strong>26.</strong> What part of his afterlife palace was the Emperor Qin Shi Huang buried in?</p>
+                                <input type="text" class="answer-input" id="q26" placeholder="26">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Arrows -->
+    <div class="nav-arrows">
+        <button class="nav-arrow prev" id="prev-btn" onclick="previousQuestion()" title="Previous">&#8592;</button>
+        <button class="nav-arrow next" id="next-btn" onclick="nextQuestion()" title="Next">&#8594;</button>
+    </div>
+
+    <!-- Bottom Nav: Q14–26 only -->
+    <nav class="nav-row" id="nav-row" role="navigation" aria-label="Question navigation">
+        <div class="footer__subquestionWrapper___9GgoP">
+            <button class="subQuestion scorable-item" onclick="goToQuestion(14)"><span class="sr-only">Q14</span><span aria-hidden="true">14</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(15)"><span class="sr-only">Q15</span><span aria-hidden="true">15</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(16)"><span class="sr-only">Q16</span><span aria-hidden="true">16</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(17)"><span class="sr-only">Q17</span><span aria-hidden="true">17</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(18)"><span class="sr-only">Q18</span><span aria-hidden="true">18</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(19)"><span class="sr-only">Q19</span><span aria-hidden="true">19</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(20)"><span class="sr-only">Q20</span><span aria-hidden="true">20</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(21)"><span class="sr-only">Q21</span><span aria-hidden="true">21</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(22)"><span class="sr-only">Q22</span><span aria-hidden="true">22</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(23)"><span class="sr-only">Q23</span><span aria-hidden="true">23</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(24)"><span class="sr-only">Q24</span><span aria-hidden="true">24</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(25)"><span class="sr-only">Q25</span><span aria-hidden="true">25</span></button>
+            <button class="subQuestion scorable-item" onclick="goToQuestion(26)"><span class="sr-only">Q26</span><span aria-hidden="true">26</span></button>
+        </div>
+        <button id="deliver-button" class="footer__deliverButton___3FM07">
+            <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 0 24 24" width="18px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+            <span>Check Answers</span>
+        </button>
+    </nav>
+
+    <!-- Context Menu -->
+    <div id="contextMenu" class="context-menu">
+        <div class="context-menu-item" id="menu-highlight" onclick="highlightText()">🖊 Highlight</div>
+        <div class="context-menu-item" id="menu-note" onclick="openNoteModal()">📝 Add Note</div>
+        <div class="context-menu-item" id="menu-clear" onclick="clearHighlight()" style="display:none;">🗑 Clear</div>
+        <div class="context-menu-item" id="menu-clear-all" onclick="clearAllHighlights()" style="display:none;">🗑 Clear All</div>
+    </div>
+
+    <!-- Note Modal -->
+    <div id="note-modal" class="notes-modal-overlay">
+        <div class="notes-modal">
+            <h3>📝 Add a Note</h3>
+            <textarea id="note-input" placeholder="Type your note here..."></textarea>
+            <div class="notes-modal-btns">
+                <button class="btn-cancel" onclick="closeNoteModal()">Cancel</button>
+                <button class="btn-save" onclick="saveNote()">Save Note</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="results-modal" class="results-modal hidden">
+        <div class="results-modal-content">
+            <h2>Your Results</h2>
+            <div id="results-score" class="results-score"></div>
+            <div id="results-band" class="results-band"></div>
+            <div style="display:grid;grid-template-columns:40px 1fr 1fr;gap:4px;font-size:12px;font-weight:700;color:#999;padding:4px 0;border-bottom:2px solid #eee;margin-bottom:8px;">
+                <span>#</span><span>Your Answer</span><span>Correct Answer</span>
+            </div>
+            <div id="results-details"></div>
+            <button class="close-results-btn" onclick="closeResultsModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // ── CONSTANTS ───────────────────────────────────────────────
+        const FIRST_Q       = 14;
+        const LAST_Q        = 26;
+        const TOTAL_Q       = LAST_Q - FIRST_Q + 1; // 13
+        const TIMER_SECONDS = 1200; // 20:00
+
+        // ── STATE ───────────────────────────────────────────────────
+        let currentQuestion = FIRST_Q;
+        let timerSeconds    = TIMER_SECONDS;
+        let timerInterval   = null;
+        let isRunning       = false;
+        let isExamMode      = false;
+
+        // ── ANSWER KEY — exact values from Reading.html, keys 14–26 only ──
+        const correctAnswers = {
+            '14': 'TRUE',
+            '15': 'FALSE',
+            '16': 'TRUE',
+            '17': 'NOT GIVEN',
+            '18': 'elm',
+            '19': 'lubricating oil',
+            '20': '18-32',
+            '21': 'dish/flat cone',
+            '22': 'struts',
+            '23': 'bronze',
+            '24': 'neck',
+            '25': 'sand',
+            '26': 'tomb complex'
+        };
+
+        // ── DOM REFS ────────────────────────────────────────────────
+        const timerDisplay   = document.getElementById('timer-display');
+        const timerToggleBtn = document.getElementById('timer-toggle-btn');
+        const timerResetBtn  = document.getElementById('timer-reset-btn');
+        const deliverButton  = document.getElementById('deliver-button');
+        const resizer        = document.getElementById('resizer');
+        const passagePanel   = document.getElementById('passage-panel');
+        const questionsPanel = document.getElementById('questions-panel');
+        const contextMenu    = document.getElementById('contextMenu');
+        const panels         = [passagePanel, questionsPanel];
+
+        // ── TIMER ───────────────────────────────────────────────────
+        function formatTime(s) {
+            return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+        }
+        function updateTimerDisplay() {
+            timerDisplay.textContent = formatTime(timerSeconds);
+            timerDisplay.classList.toggle('urgent', timerSeconds <= 120);
+        }
+        function startTimer() {
+            if (isRunning) return;
+            isRunning = true;
+            timerToggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+            timerInterval = setInterval(() => {
+                if (timerSeconds <= 0) { clearInterval(timerInterval); isRunning = false; if (isExamMode) checkAnswers(); return; }
+                timerSeconds--;
+                updateTimerDisplay();
+            }, 1000);
+        }
+        function pauseTimer() {
+            clearInterval(timerInterval); isRunning = false;
+            timerToggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M8 5v14l11-7L8 5z"/></svg>';
+        }
+        timerToggleBtn.addEventListener('click', () => { if (isRunning) pauseTimer(); else startTimer(); });
+        timerResetBtn.addEventListener('click',  () => { pauseTimer(); timerSeconds = TIMER_SECONDS; updateTimerDisplay(); });
+
+        // ── MODE SELECTION ──────────────────────────────────────────
+        document.getElementById('btn-exam-mode').addEventListener('click', () => {
+            isExamMode = true;
+            document.body.classList.add('exam-mode');
+            document.getElementById('pretest-overlay').style.display = 'none';
+            startTimer();
+        });
+        document.getElementById('btn-practice-mode').addEventListener('click', () => {
+            document.getElementById('pretest-overlay').style.display = 'none';
+            startTimer();
+        });
+        document.getElementById('back-btn').addEventListener('click', () => {
+            if (confirm('Quit? Progress will not be saved.')) window.location.href = 'index.html';
+        });
+
+        // ── NAVIGATION ──────────────────────────────────────────────
+        function isQuestionAnswered(qNum) {
+            // Q14–17: T/F/NG radio
+            if (qNum >= 14 && qNum <= 17) {
+                return document.querySelector(`input[name="q${qNum}"]:checked`) !== null;
+            }
+            // Q18–26: text inputs
+            const inp = document.getElementById(`q${qNum}`);
+            return inp ? inp.value.trim() !== '' : false;
+        }
+
+        function updateAllIndicators() {
+            for (let i = FIRST_Q; i <= LAST_Q; i++) {
+                const btn = document.querySelector(`.subQuestion[onclick="goToQuestion(${i})"]`);
+                if (!btn) continue;
+                if (i === currentQuestion) {
+                    btn.classList.add('active'); btn.classList.remove('answered');
+                } else if (isQuestionAnswered(i)) {
+                    btn.classList.add('answered'); btn.classList.remove('active');
+                } else {
+                    btn.classList.remove('active', 'answered');
+                }
+            }
+            document.getElementById('prev-btn').disabled = currentQuestion <= FIRST_Q;
+            document.getElementById('next-btn').disabled = currentQuestion >= LAST_Q;
+        }
+
+        function clearActiveQuestion() {
+            // Remove active state from TF questions
+            document.querySelectorAll('.tf-question.active-question').forEach(el => el.classList.remove('active-question'));
+            // Remove active state from short answer items
+            document.querySelectorAll('.short-answer-item.active-question').forEach(el => el.classList.remove('active-question'));
+            // Remove active-input from text inputs
+            document.querySelectorAll('.answer-input.active-input').forEach(el => el.classList.remove('active-input'));
+        }
+
+        function scrollToQuestion(qNum) {
+            let el = null;
+            if (qNum >= 14 && qNum <= 17) {
+                el = document.querySelector(`.tf-question[data-q-start="${qNum}"]`);
+            } else if (qNum >= 18 && qNum <= 23) {
+                el = document.querySelector(`.note-item[data-q-start="${qNum}"]`);
+            } else {
+                el = document.querySelector(`.short-answer-item[data-q-start="${qNum}"]`);
+            }
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        window.goToQuestion = function(qNum) {
+            if (qNum < FIRST_Q || qNum > LAST_Q) return;
+            currentQuestion = qNum;
+            clearActiveQuestion();
+
+            if (qNum >= 14 && qNum <= 17) {
+                const el = document.querySelector(`.tf-question[data-q-start="${qNum}"]`);
+                if (el) el.classList.add('active-question');
+            } else if (qNum >= 18 && qNum <= 23) {
+                const inp = document.getElementById(`q${qNum}`);
+                if (inp) inp.classList.add('active-input');
+            } else {
+                const el = document.querySelector(`.short-answer-item[data-q-start="${qNum}"]`);
+                if (el) el.classList.add('active-question');
+                const inp = document.getElementById(`q${qNum}`);
+                if (inp) inp.classList.add('active-input');
+            }
+
+            scrollToQuestion(qNum);
+            updateAllIndicators();
+        };
+
+        window.nextQuestion     = () => { if (currentQuestion < LAST_Q)  goToQuestion(currentQuestion + 1); };
+        window.previousQuestion = () => { if (currentQuestion > FIRST_Q) goToQuestion(currentQuestion - 1); };
+
+        // Click on TF questions to navigate
+        document.querySelectorAll('.tf-question[data-q-start]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const qNum = parseInt(el.dataset.qStart, 10);
+                if (!isNaN(qNum) && qNum !== currentQuestion) goToQuestion(qNum);
+            });
+        });
+
+        // Click on note items to navigate
+        document.querySelectorAll('.note-item[data-q-start]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const qNum = parseInt(el.dataset.qStart, 10);
+                if (!isNaN(qNum) && qNum !== currentQuestion) goToQuestion(qNum);
+            });
+        });
+
+        // Click on short answer items to navigate
+        document.querySelectorAll('.short-answer-item[data-q-start]').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const qNum = parseInt(el.dataset.qStart, 10);
+                if (!isNaN(qNum) && qNum !== currentQuestion) goToQuestion(qNum);
+            });
+        });
+
+        document.body.addEventListener('input',  updateAllIndicators);
+        document.body.addEventListener('change', updateAllIndicators);
+
+        // ── CHECK ANSWERS ───────────────────────────────────────────
+        function handleSubmitClick() {
+            if (confirm('Submit? You will not be able to change your answers.')) checkAnswers();
+        }
+
+        function checkAnswers() {
+            clearInterval(timerInterval); isRunning = false;
+            document.querySelectorAll('input, select').forEach(el => { el.disabled = true; });
+            deliverButton.disabled = true;
+
+            let score = 0;
+            const details = document.getElementById('results-details');
+            details.innerHTML = '';
+
+            // Normalise helper for text answers
+            const norm = s => (s || '').toString().toLowerCase()
+                .replace(/[^a-z0-9\s\-\/]/g, '').replace(/\s+/g, ' ').trim();
+
+            for (let i = FIRST_Q; i <= LAST_Q; i++) {
+                const key        = String(i);
+                const correct    = correctAnswers[key];
+                const correctTxt = Array.isArray(correct) ? correct.join(' / ') : correct;
+                let userAnswer   = '';
+                let isCorrect    = false;
+                let displayAns   = 'Not Answered';
+
+                if (i >= 14 && i <= 17) {
+                    // T/F/NG radio group
+                    const checked = document.querySelector(`input[name="q${i}"]:checked`);
+                    if (checked) {
+                        userAnswer = checked.value;
+                        displayAns = userAnswer;
+                        isCorrect  = userAnswer === correct;
+                        const optDiv = checked.closest('.tf-option');
+                        if (optDiv) optDiv.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    }
+                    if (!isCorrect) {
+                        // Highlight the correct option
+                        const correctRadio = document.querySelector(`input[name="q${i}"][value="${correct}"]`);
+                        if (correctRadio) {
+                            const optDiv = correctRadio.closest('.tf-option');
+                            if (optDiv) optDiv.classList.add('correct-answer-highlight');
+                        }
+                    }
+                } else {
+                    // Text input (Q18–26)
+                    const inp = document.getElementById(`q${i}`);
+                    if (inp) {
+                        userAnswer = inp.value.trim();
+                        displayAns = userAnswer || 'Not Answered';
+                        // Accept multiple valid spellings / slashes
+                        const acceptedArr = Array.isArray(correct)
+                            ? correct
+                            : correct.split('/').map(s => s.trim());
+                        isCorrect = acceptedArr.some(a => norm(a) === norm(userAnswer));
+                        inp.classList.add(isCorrect ? 'correct' : 'incorrect');
+                        if (!isCorrect) {
+                            const span = document.createElement('span');
+                            span.className = 'correct-answer-display';
+                            span.innerHTML = ` ➜ <span class="correct-answer-highlight-text">${correctTxt}</span>`;
+                            inp.parentNode.insertBefore(span, inp.nextSibling);
+                        }
+                    }
+                }
+
+                if (isCorrect) score++;
+
+                // Nav button marking
+                const btn = document.querySelector(`.subQuestion[onclick="goToQuestion(${i})"]`);
+                if (btn) {
+                    btn.classList.remove('active', 'answered');
+                    btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+                }
+
+                // Results row
+                const row = document.createElement('div');
+                row.style.cssText = 'display:grid;grid-template-columns:40px 1fr 1fr;gap:8px;padding:6px 0;border-bottom:1px solid #eee;font-size:14px;' + (isCorrect ? '' : 'background:#fff5f5;');
+                row.innerHTML = `<span style="font-weight:700">${i}</span><span style="color:#555">${displayAns}</span><span style="color:#28a745;font-weight:600">${correctTxt}</span>`;
+                details.appendChild(row);
+            }
+
+            const band = getBand(score, TOTAL_Q);
+            document.getElementById('results-score').textContent = `${score} / ${TOTAL_Q}`;
+            document.getElementById('results-band').textContent  = `Estimated Band: ${band}`;
+
+            deliverButton.innerHTML = '<span>View Results</span>';
+            deliverButton.disabled  = false;
+            deliverButton.onclick   = () => document.getElementById('results-modal').classList.remove('hidden');
+            document.body.classList.add('results-mode');
+            document.getElementById('results-modal').classList.remove('hidden');
+        }
+
+        function getBand(score, total) {
+            const p = score / total;
+            if (p >= 0.90) return 9.0;
+            if (p >= 0.80) return 8.0;
+            if (p >= 0.70) return 7.0;
+            if (p >= 0.60) return 6.0;
+            if (p >= 0.50) return 5.5;
+            if (p >= 0.40) return 5.0;
+            return 4.5;
+        }
+
+        window.closeResultsModal = () => document.getElementById('results-modal').classList.add('hidden');
+        deliverButton.addEventListener('click', handleSubmitClick);
+
+        // ── RESIZER ─────────────────────────────────────────────────
+        let isResizing = false, startX, startLeftWidth;
+        resizer.addEventListener('mousedown', (e) => {
+            isResizing = true; startX = e.clientX;
+            startLeftWidth = passagePanel.getBoundingClientRect().width;
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        });
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            const cw = passagePanel.parentElement.getBoundingClientRect().width;
+            const nw = startLeftWidth + (e.clientX - startX);
+            if (nw >= 200 && nw <= cw - 216) {
+                passagePanel.style.flex = 'none'; passagePanel.style.width = `${nw}px`;
+                questionsPanel.style.flex = 'none'; questionsPanel.style.width = `${cw - nw - 16}px`;
+            }
+        });
+        document.addEventListener('mouseup', () => { if (isResizing) { isResizing = false; document.body.style.cursor = ''; document.body.style.userSelect = ''; } });
+        resizer.addEventListener('touchstart', (e) => { isResizing = true; startX = e.touches[0].clientX; startLeftWidth = passagePanel.getBoundingClientRect().width; }, { passive: true });
+        document.addEventListener('touchmove', (e) => {
+            if (!isResizing) return;
+            const cw = passagePanel.parentElement.getBoundingClientRect().width;
+            const nw = startLeftWidth + (e.touches[0].clientX - startX);
+            if (nw >= 200 && nw <= cw - 216) {
+                passagePanel.style.flex = 'none'; passagePanel.style.width = `${nw}px`;
+                questionsPanel.style.flex = 'none'; questionsPanel.style.width = `${cw - nw - 16}px`;
+            }
+        }, { passive: true });
+        document.addEventListener('touchend', () => { isResizing = false; });
+
+        // ── CONTEXT MENU ────────────────────────────────────────────
+        let selectedRange = null;
+
+        document.addEventListener('selectionchange', () => {
+            const sel = window.getSelection();
+            if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+                const range = sel.getRangeAt(0);
+                if (panels.some(p => p.contains(range.commonAncestorContainer))) {
+                    selectedRange = range;
+                    contextMenu.targetElementForClear = null;
+                }
+            }
+        });
+
+        panels.forEach(panel => {
+            panel.addEventListener('contextmenu', (e) => {
+                const target    = e.target;
+                const onHL      = target.closest('.highlight, .comment-highlight');
+                const selActive = selectedRange && selectedRange.toString().trim().length > 0;
+                let showMenu    = false;
+
+                if (onHL) {
+                    document.getElementById('menu-highlight').style.display = 'none';
+                    document.getElementById('menu-note').style.display      = 'none';
+                    document.getElementById('menu-clear').style.display     = 'block';
+                    document.getElementById('menu-clear-all').style.display = 'block';
+                    contextMenu.targetElementForClear = onHL;
+                    showMenu = true;
+                } else if (selActive && panels.some(p => p.contains(selectedRange.commonAncestorContainer))) {
+                    document.getElementById('menu-highlight').style.display = 'flex';
+                    document.getElementById('menu-note').style.display      = 'flex';
+                    document.getElementById('menu-clear').style.display     = 'none';
+                    document.getElementById('menu-clear-all').style.display = 'block';
+                    showMenu = true;
+                }
+
+                if (showMenu) {
+                    e.preventDefault();
+                    contextMenu.style.display = 'block';
+                    let left = e.pageX, top = e.pageY - contextMenu.offsetHeight - 5;
+                    if (left + contextMenu.offsetWidth > window.innerWidth) left = window.innerWidth - contextMenu.offsetWidth - 5;
+                    if (top < 0) top = e.pageY + 5;
+                    contextMenu.style.left = `${left}px`;
+                    contextMenu.style.top  = `${top}px`;
+                }
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (contextMenu.style.display === 'block' && !contextMenu.contains(e.target)) closeContextMenu();
+        });
+
+        function closeContextMenu() { contextMenu.style.display = 'none'; selectedRange = null; }
+
+        function unwrap(el) {
+            const p = el.parentNode; if (!p) return;
+            while (el.firstChild) p.insertBefore(el.firstChild, el);
+            p.removeChild(el); p.normalize();
+        }
+
+        window.highlightText = () => {
+            if (selectedRange && !selectedRange.collapsed) {
+                const span = document.createElement('span'); span.className = 'highlight';
+                span.appendChild(selectedRange.extractContents());
+                selectedRange.insertNode(span);
+            }
+            closeContextMenu(); window.getSelection().removeAllRanges();
+        };
+        window.clearHighlight = () => {
+            const el = contextMenu.targetElementForClear;
+            if (el) unwrap(el);
+            closeContextMenu(); window.getSelection().removeAllRanges();
+        };
+        window.clearAllHighlights = () => {
+            document.querySelectorAll('.highlight, .comment-highlight').forEach(unwrap);
+            closeContextMenu(); window.getSelection().removeAllRanges();
+        };
+
+        // ── NOTE MODAL ──────────────────────────────────────────────
+        window.openNoteModal = () => {
+            contextMenu.style.display = 'none';
+            document.getElementById('note-modal').classList.add('active');
+            document.getElementById('note-input').focus();
+        };
+        window.closeNoteModal = () => {
+            document.getElementById('note-modal').classList.remove('active');
+            document.getElementById('note-input').value = '';
+            selectedRange = null; window.getSelection().removeAllRanges();
+        };
+        window.saveNote = () => {
+            const note = document.getElementById('note-input').value.trim();
+            if (note && selectedRange && !selectedRange.collapsed) {
+                const span = document.createElement('span'); span.className = 'comment-highlight';
+                const tip  = document.createElement('span'); tip.className  = 'comment-tooltip'; tip.textContent = note;
+                span.appendChild(selectedRange.extractContents()); span.appendChild(tip);
+                selectedRange.insertNode(span);
+            }
+            closeNoteModal();
+        };
+
+        // ── INIT ────────────────────────────────────────────────────
+        updateTimerDisplay();
+        goToQuestion(FIRST_Q);
+
+    }); // end DOMContentLoaded
+    </script>
+</body>
+</html>

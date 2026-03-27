@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Speaking Practice — IELTSPRACTICE</title>
+    <style>
+        /* ═══════════════════════════════════════════════════════════
+           RESET & BASE
+        ═══════════════════════════════════════════════════════════ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f7f8fa;
+            line-height: 1.5;
+            font-size: 16px;
+            color: #222;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           WATERMARK
+        ═══════════════════════════════════════════════════════════ */
+        body::after {
+            content: "IELTSPRACTICE";
+            position: fixed;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%) rotate(-20deg);
+            font-size: 72px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #000;
+            opacity: 0.025;
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           HEADER
+        ═══════════════════════════════════════════════════════════ */
+        .header {
+            background: #ffffff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 500;
+            height: 60px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .back-btn {
+            background: none;
+            border: 1.5px solid #ccc;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s, border-color 0.2s;
+            font-family: Arial, sans-serif;
+        }
+        .back-btn:hover { background: #f5f5f5; border-color: #999; }
+
+        .ielts-logo {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #1a1a2e;
+            gap: 6px;
+            text-decoration: none;
+        }
+        .ielts-logo-badge {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .exam-mode-badge {
+            display: none;
+            background: #dc3545;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 99px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        body.exam-mode .exam-mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        body.exam-mode .exam-mode-badge::before {
+            content: '';
+            display: inline-block;
+            width: 7px; height: 7px;
+            background: #fff;
+            border-radius: 50%;
+            animation: blink 1.2s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.2; }
+        }
+
+        /* Timer area */
+        .timer-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+        .timer-display { font-variant-numeric: tabular-nums; }
+        .timer-display.urgent { color: #dc3545; font-weight: 700; }
+
+        .timer-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .timer-controls button {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            width: 32px; height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .timer-controls button:hover { background: #e0e0e0; }
+        .timer-controls button svg { width: 18px; height: 18px; fill: #333; }
+        body.exam-mode #timer-toggle-btn,
+        body.exam-mode #timer-reset-btn { display: none !important; }
+
+        /* ═══════════════════════════════════════════════════════════
+           PRE-TEST MODAL
+        ═══════════════════════════════════════════════════════════ */
+        .pretest-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 15, 30, 0.75);
+            z-index: 3000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(3px);
+        }
+        .pretest-modal {
+            background: #fff;
+            border-radius: 12px;
+            padding: 40px 36px 32px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .pretest-modal .modal-logo {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #1a1a2e;
+            margin-bottom: 24px;
+        }
+        .pretest-modal .modal-logo span {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .pretest-modal h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+        }
+        .pretest-modal > p {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .pretest-modal .exam-note {
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 13px;
+            color: #795548;
+            margin-bottom: 28px;
+            text-align: left;
+        }
+        .pretest-modal .exam-note strong { color: #e65100; }
+        .pretest-btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        .pretest-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            font-family: Arial, sans-serif;
+        }
+        .pretest-btn.btn-exam  { background: #1a1a2e; color: #fff; }
+        .pretest-btn.btn-exam:hover { background: #2d2d4e; }
+        .pretest-btn.btn-practice { background: #fff; color: #1a1a2e; border-color: #ccc; }
+        .pretest-btn.btn-practice:hover { background: #f5f5f5; border-color: #999; }
+
+        /* ═══════════════════════════════════════════════════════════
+           MAIN LAYOUT
+        ═══════════════════════════════════════════════════════════ */
+        .main-container {
+            margin-top: 60px;
+            min-height: calc(100vh - 60px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px 60px;
+        }
+
+        /* ─── Part pill nav ─────────────────────────────────────── */
+        .part-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+        .part-pill {
+            padding: 7px 20px;
+            border-radius: 99px;
+            border: 1.5px solid #ccc;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: Arial, sans-serif;
+        }
+        .part-pill:hover { border-color: #1a1a2e; color: #1a1a2e; }
+        .part-pill.active {
+            background: #1a1a2e;
+            color: #fff;
+            border-color: #1a1a2e;
+        }
+        body.exam-mode .part-pill { pointer-events: none; opacity: 0.5; }
+        body.exam-mode .part-pill.active { opacity: 1; }
+
+        /* ═══════════════════════════════════════════════════════════
+           CONTENT CARD
+        ═══════════════════════════════════════════════════════════ */
+        .content-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+            border: 1px solid #e8e8e8;
+            width: 100%;
+            max-width: 780px;
+            overflow: hidden;
+            animation: fadeCard 0.25s ease;
+        }
+        @keyframes fadeCard {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 18px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .card-header-left { display: flex; flex-direction: column; gap: 4px; }
+        .card-part-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+        .card-part-title {
+            font-size: 19px;
+            font-weight: 800;
+        }
+        .card-duration-badge {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .card-body { padding: 28px 28px 24px; }
+
+        /* ─── Topic / question navigation ─────────────────────── */
+        .topic-progress {
+            font-size: 12px;
+            font-weight: 600;
+            color: #999;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .question-block { display: none; }
+        .question-block.active { display: block; }
+
+        /* ─── Part 1 question styling ─────────────────────────── */
+        .p1-topic-heading {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #1a1a2e;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .p1-question {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .p1-followups {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 18px;
+        }
+        .p1-followups li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 15px;
+            color: #444;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #f7f8fa;
+            border: 1px solid #ececec;
+        }
+        .p1-followups li::before {
+            content: "▸";
+            color: #1a1a2e;
+            font-size: 13px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        /* ─── Part 2 prompt card ───────────────────────────────── */
+        .p2-task-card {
+            background: #f9f6ee;
+            border: 2px solid #d4b483;
+            border-radius: 10px;
+            padding: 22px 24px;
+            margin-bottom: 22px;
+        }
+        .p2-task-card .task-instruction {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 14px;
+        }
+        .p2-task-card .task-main {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        .p2-task-card .task-cues {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .p2-task-card .task-cues li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 15px;
+            color: #333;
+        }
+        .p2-task-card .task-cues li::before {
+            content: "•";
+            color: #c8932a;
+            font-size: 18px;
+            line-height: 1.1;
+            flex-shrink: 0;
+        }
+        .p2-task-card .task-note {
+            margin-top: 16px;
+            font-size: 13px;
+            font-style: italic;
+            color: #8a6e3a;
+            padding-top: 14px;
+            border-top: 1px dashed #d4b483;
+        }
+
+        /* Follow-up question box */
+        .p2-followup-box {
+            background: #f0f7ff;
+            border: 1.5px solid #b8d4f0;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 22px;
+            font-size: 14px;
+            color: #1a1a2e;
+        }
+        .p2-followup-box .followup-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #4a7ab8;
+            margin-bottom: 6px;
+        }
+        .p2-followup-box .followup-question {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        /* Highlighted text from context menu */
+        .highlight {
+            background: #ffeb3b;
+            border-radius: 2px;
+        }
+
+        /* ─── Prep timer ───────────────────────────────────────── */
+        .prep-timer-section {
+            background: #f0f7ff;
+            border: 1.5px solid #b8d4f0;
+            border-radius: 10px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+        .prep-timer-info { flex: 1; min-width: 160px; }
+        .prep-timer-info .prep-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #4a7ab8;
+            margin-bottom: 4px;
+        }
+        .prep-timer-info .prep-desc {
+            font-size: 13px;
+            color: #555;
+        }
+        .prep-timer-display {
+            font-size: 36px;
+            font-weight: 800;
+            color: #1a1a2e;
+            font-variant-numeric: tabular-nums;
+            min-width: 80px;
+            text-align: center;
+        }
+        .prep-timer-display.running { color: #1565c0; }
+        .prep-timer-display.done    { color: #28a745; }
+        .prep-start-btn {
+            background: #1a1a2e;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 11px 22px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: Arial, sans-serif;
+            white-space: nowrap;
+        }
+        .prep-start-btn:hover { background: #2d2d4e; }
+        .prep-start-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+        /* ─── Part 3 questions ─────────────────────────────────── */
+        .p3-question {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+            line-height: 1.55;
+        }
+        .p3-theme-tag {
+            display: inline-block;
+            background: #eef0ff;
+            color: #3949ab;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 9px;
+            border-radius: 99px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+        }
+        .p3-hint {
+            font-size: 13px;
+            color: #888;
+            font-style: italic;
+            margin-top: 6px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           RECORD BUTTON + WAVEFORM
+        ═══════════════════════════════════════════════════════════ */
+        .record-section {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .record-btn {
+            width: 68px; height: 68px;
+            border-radius: 50%;
+            border: none;
+            background: #e53935;
+            color: #fff;
+            font-size: 26px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 16px rgba(229,57,53,0.35);
+            position: relative;
+            font-family: Arial, sans-serif;
+        }
+        .record-btn:hover {
+            background: #c62828;
+            transform: scale(1.05);
+            box-shadow: 0 6px 24px rgba(229,57,53,0.45);
+        }
+        .record-btn.recording {
+            background: #c62828;
+            animation: pulse-ring 1.4s ease infinite;
+        }
+        .record-btn.recording .rec-icon  { display: none; }
+        .record-btn.recording .stop-icon { display: block; }
+        .rec-icon  { display: block; }
+        .stop-icon { display: none; }
+
+        @keyframes pulse-ring {
+            0%   { box-shadow: 0 0 0 0   rgba(229,57,53,0.55); }
+            70%  { box-shadow: 0 0 0 18px rgba(229,57,53,0); }
+            100% { box-shadow: 0 0 0 0   rgba(229,57,53,0); }
+        }
+
+        .record-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #aaa;
+        }
+        .record-label.active { color: #e53935; }
+
+        /* Waveform bars */
+        .waveform {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            height: 32px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .waveform.visible { opacity: 1; }
+        .waveform-bar {
+            width: 4px;
+            background: #e53935;
+            border-radius: 2px;
+            animation: none;
+        }
+        .waveform.visible .waveform-bar {
+            animation: wave 0.9s ease-in-out infinite alternate;
+        }
+        .waveform-bar:nth-child(1)  { animation-delay: 0.00s; }
+        .waveform-bar:nth-child(2)  { animation-delay: 0.07s; }
+        .waveform-bar:nth-child(3)  { animation-delay: 0.14s; }
+        .waveform-bar:nth-child(4)  { animation-delay: 0.21s; }
+        .waveform-bar:nth-child(5)  { animation-delay: 0.28s; }
+        .waveform-bar:nth-child(6)  { animation-delay: 0.35s; }
+        .waveform-bar:nth-child(7)  { animation-delay: 0.42s; }
+        .waveform-bar:nth-child(8)  { animation-delay: 0.49s; }
+        .waveform-bar:nth-child(9)  { animation-delay: 0.56s; }
+        .waveform-bar:nth-child(10) { animation-delay: 0.63s; }
+        .waveform-bar:nth-child(11) { animation-delay: 0.56s; }
+        .waveform-bar:nth-child(12) { animation-delay: 0.49s; }
+        .waveform-bar:nth-child(13) { animation-delay: 0.42s; }
+        .waveform-bar:nth-child(14) { animation-delay: 0.35s; }
+        .waveform-bar:nth-child(15) { animation-delay: 0.28s; }
+        .waveform-bar:nth-child(16) { animation-delay: 0.21s; }
+        .waveform-bar:nth-child(17) { animation-delay: 0.14s; }
+        .waveform-bar:nth-child(18) { animation-delay: 0.07s; }
+        .waveform-bar:nth-child(19) { animation-delay: 0.00s; }
+
+        @keyframes wave {
+            from { height: 5px; }
+            to   { height: 28px; }
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           PREV / NEXT NAV
+        ═══════════════════════════════════════════════════════════ */
+        .card-footer {
+            padding: 16px 28px 22px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .nav-btn {
+            padding: 9px 22px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-btn.prev { background: #fff; border: 1.5px solid #ccc; color: #444; }
+        .nav-btn.prev:hover { background: #f5f5f5; border-color: #999; }
+        .nav-btn.next { background: #1a1a2e; border: 1.5px solid #1a1a2e; color: #fff; }
+        .nav-btn.next:hover { background: #2d2d4e; }
+        .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        .question-dots { display: flex; gap: 7px; }
+        .q-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #ddd;
+            transition: background 0.2s;
+        }
+        .q-dot.active  { background: #1a1a2e; }
+        .q-dot.visited { background: #8899b8; }
+
+        /* ═══════════════════════════════════════════════════════════
+           CONTEXT MENU
+        ═══════════════════════════════════════════════════════════ */
+        .context-menu {
+            position: fixed;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.13);
+            z-index: 4000;
+            display: none;
+            min-width: 160px;
+            overflow: hidden;
+        }
+        .context-menu-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 1px solid #f3f3f3;
+            transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #333;
+            user-select: none;
+        }
+        .context-menu-item:last-child { border-bottom: none; }
+        .context-menu-item:hover { background: #f7f8fa; }
+        .context-menu-item.danger { color: #dc3545; }
+        .context-menu-item.danger:hover { background: #fff5f5; }
+
+        /* ─── Notes panel ─────────────────────────────────────── */
+        .notes-panel {
+            position: fixed;
+            top: 90px; right: 24px;
+            width: 260px;
+            background: #fffde7;
+            border: 1px solid #f9a825;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            z-index: 1500;
+            display: none;
+            flex-direction: column;
+        }
+        .notes-panel.visible { display: flex; }
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 14px;
+            background: #f9a825;
+            border-radius: 10px 10px 0 0;
+            cursor: move;
+            user-select: none;
+        }
+        .notes-header span { font-size: 13px; font-weight: 700; color: #fff; }
+        .notes-close {
+            background: none; border: none;
+            color: #fff; font-size: 18px;
+            cursor: pointer; line-height: 1;
+        }
+        .notes-body { padding: 10px; }
+        .notes-textarea {
+            width: 100%; min-height: 120px;
+            border: 1px solid #f9a825;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 13px;
+            font-family: Arial, sans-serif;
+            resize: vertical;
+            outline: none;
+            background: #fffff0;
+        }
+
+        /* ─── Utility ─────────────────────────────────────────── */
+        .hidden { display: none !important; }
+
+        /* ─── Responsive ──────────────────────────────────────── */
+        @media (max-width: 600px) {
+            .card-body  { padding: 20px 16px 16px; }
+            .card-header { padding: 16px 18px; }
+            .card-footer { padding: 14px 18px; flex-wrap: wrap; }
+            .prep-timer-section { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PRE-TEST MODAL
+═══════════════════════════════════════════════════════════════ -->
+<div id="pretest-overlay" class="pretest-overlay">
+    <div class="pretest-modal">
+        <div class="modal-logo"><span>IELTS</span>PRACTICE</div>
+        <h2>Choose Your Test Mode</h2>
+        <p>Would you like to take this in a <strong>Real Exam Environment</strong>?</p>
+        <div class="exam-note">
+            <strong>⚠️ Real Exam Mode:</strong> The test timer starts immediately and cannot be paused. You must follow the natural part order (Parts 1 → 2 → 3). Total time: 11–14 minutes.
+        </div>
+        <div class="pretest-btn-group">
+            <button class="pretest-btn btn-exam"     id="btn-exam-mode">Yes — Real Exam Mode</button>
+            <button class="pretest-btn btn-practice" id="btn-practice-mode">No — Practice Mode</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════════════════════ -->
+<div class="header">
+    <div class="header-left">
+        <button class="back-btn" id="back-btn">← Back</button>
+        <div class="ielts-logo">
+            <span class="ielts-logo-badge">IELTS</span>PRACTICE
+        </div>
+        <span class="exam-mode-badge" id="exam-mode-badge">Exam Mode</span>
+    </div>
+
+    <div class="timer-container">
+        <span class="timer-display" id="timer-display">14:00</span>
+        <div class="timer-controls">
+            <button id="timer-toggle-btn" title="Pause / Resume">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button id="timer-reset-btn" title="Reset Timer">
+                <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════════════════════════ -->
+<div class="main-container">
+
+    <!-- Part navigation pills -->
+    <nav class="part-nav" id="part-nav">
+        <button class="part-pill active" data-part="1" onclick="switchPart(1)">Part 1</button>
+        <button class="part-pill"        data-part="2" onclick="switchPart(2)">Part 2</button>
+        <button class="part-pill"        data-part="3" onclick="switchPart(3)">Part 3</button>
+    </nav>
+
+    <!-- ─────────────────────────────────────────────────────────
+         PART 1 — Introduction & Interview
+    ───────────────────────────────────────────────────────── -->
+    <div class="content-card" id="card-part-1">
+        <div class="card-header">
+            <div class="card-header-left">
+                <span class="card-part-label">Part 1</span>
+                <span class="card-part-title">Introduction &amp; Interview</span>
+            </div>
+            <span class="card-duration-badge">⏱ 4–5 minutes</span>
+        </div>
+
+        <div class="card-body">
+            <div class="topic-progress" id="p1-progress">Topic 1 of 2 · Accommodation</div>
+
+            <!-- TOPIC 1: Accommodation -->
+            <div class="question-block active" id="p1-q1">
+                <div class="p1-topic-heading">🏠 Topic 1 — Accommodation</div>
+                <p class="p1-question">Do you live in a flat or a house?</p>
+                <ul class="p1-followups">
+                    <li>What do you like about your home?</li>
+                    <li>Is there anything you would like to change about your home?</li>
+                    <li>Do you plan to live there for a long time?</li>
+                </ul>
+            </div>
+
+            <!-- TOPIC 2: Typing -->
+            <div class="question-block" id="p1-q2">
+                <div class="p1-topic-heading">⌨️ Topic 2 — Typing</div>
+                <p class="p1-question">How did you learn how to type?</p>
+                <ul class="p1-followups">
+                    <li>When did you first learn to use a keyboard?</li>
+                    <li>How do you improve your typing speed?</li>
+                    <li>Do you think typing is more important than handwriting nowadays?</li>
+                </ul>
+            </div>
+
+            <!-- Record button -->
+            <div class="record-section">
+                <div class="waveform" id="waveform-p1">
+                    <div class="waveform-bar" style="height:8px"></div>
+                    <div class="waveform-bar" style="height:14px"></div>
+                    <div class="waveform-bar" style="height:20px"></div>
+                    <div class="waveform-bar" style="height:26px"></div>
+                    <div class="waveform-bar" style="height:22px"></div>
+                    <div class="waveform-bar" style="height:16px"></div>
+                    <div class="waveform-bar" style="height:28px"></div>
+                    <div class="waveform-bar" style="height:20px"></div>
+                    <div class="waveform-bar" style="height:12px"></div>
+                    <div class="waveform-bar" style="height:24px"></div>
+                    <div class="waveform-bar" style="height:16px"></div>
+                    <div class="waveform-bar" style="height:28px"></div>
+                    <div class="waveform-bar" style="height:22px"></div>
+                    <div class="waveform-bar" style="height:18px"></div>
+                    <div class="waveform-bar" style="height:26px"></div>
+                    <div class="waveform-bar" style="height:14px"></div>
+                    <div class="waveform-bar" style="height:20px"></div>
+                    <div class="waveform-bar" style="height:10px"></div>
+                    <div class="waveform-bar" style="height:6px"></div>
+                </div>
+                <button class="record-btn" id="record-btn-p1" onclick="toggleRecord('p1')" title="Press to record your answer">
+                    <span class="rec-icon">🎙</span>
+                    <span class="stop-icon">⏹</span>
+                </button>
+                <span class="record-label" id="record-label-p1">Tap to Record</span>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <button class="nav-btn prev" id="p1-prev" onclick="p1Prev()" disabled>← Previous</button>
+            <div class="question-dots" id="p1-dots">
+                <div class="q-dot active"></div>
+                <div class="q-dot"></div>
+            </div>
+            <button class="nav-btn next" id="p1-next" onclick="p1Next()">Next →</button>
+        </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────
+         PART 2 — Individual Long Turn
+    ───────────────────────────────────────────────────────── -->
+    <div class="content-card hidden" id="card-part-2">
+        <div class="card-header">
+            <div class="card-header-left">
+                <span class="card-part-label">Part 2</span>
+                <span class="card-part-title">Individual Long Turn</span>
+            </div>
+            <span class="card-duration-badge">⏱ 3–4 minutes</span>
+        </div>
+
+        <div class="card-body">
+            <!-- Task card (highlightable) -->
+            <div class="p2-task-card" id="p2-prompt">
+                <p class="task-instruction">Read the card carefully and make notes. You have <strong>1 minute</strong> to prepare before speaking for <strong>1–2 minutes</strong>.</p>
+                <p class="task-main">Describe a movie that you watched and enjoyed.</p>
+                <ul class="task-cues">
+                    <li>What movie it was and what it was about</li>
+                    <li>When and where you watched it</li>
+                    <li>Who you watched it with</li>
+                    <li>And explain why you enjoyed watching this movie so much</li>
+                </ul>
+                <p class="task-note">You can make notes on a piece of paper to help you speak.</p>
+            </div>
+
+            <!-- Follow-up question -->
+            <div class="p2-followup-box">
+                <div class="followup-label">💬 Follow-up Question</div>
+                <p class="followup-question">Did you recommend this movie to anyone else?</p>
+            </div>
+
+            <!-- 1-minute preparation timer -->
+            <div class="prep-timer-section">
+                <div class="prep-timer-info">
+                    <div class="prep-label">Preparation Time</div>
+                    <div class="prep-desc">Press Start to begin your 1-minute preparation countdown.</div>
+                </div>
+                <div class="prep-timer-display" id="prep-display">1:00</div>
+                <button class="prep-start-btn" id="prep-start-btn" onclick="startPrepTimer()">▶ Start</button>
+            </div>
+
+            <!-- Record section -->
+            <div class="record-section">
+                <div class="waveform" id="waveform-p2">
+                    <div class="waveform-bar" style="height:8px"></div>
+                    <div class="waveform-bar" style="height:14px"></div>
+                    <div class="waveform-bar" style="height:22px"></div>
+                    <div class="waveform-bar" style="height:28px"></div>
+                    <div class="waveform-bar" style="height:20px"></div>
+                    <div class="waveform-bar" style="height:16px"></div>
+                    <div class="waveform-bar" style="height:26px"></div>
+                    <div class="waveform-bar" style="height:18px"></div>
+                    <div class="waveform-bar" style="height:24px"></div>
+                    <div class="waveform-bar" style="height:12px"></div>
+                    <div class="waveform-bar" style="height:20px"></div>
+                    <div class="waveform-bar" style="height:28px"></div>
+                    <div class="waveform-bar" style="height:16px"></div>
+                    <div class="waveform-bar" style="height:24px"></div>
+                    <div class="waveform-bar" style="height:10px"></div>
+                    <div class="waveform-bar" style="height:20px"></div>
+                    <div class="waveform-bar" style="height:26px"></div>
+                    <div class="waveform-bar" style="height:14px"></div>
+                    <div class="waveform-bar" style="height:8px"></div>
+                </div>
+                <button class="record-btn" id="record-btn-p2" onclick="toggleRecord('p2')" title="Press to record your answer">
+                    <span class="rec-icon">🎙</span>
+                    <span class="stop-icon">⏹</span>
+                </button>
+                <span class="record-label" id="record-label-p2">Tap to Record</span>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <button class="nav-btn prev" onclick="switchPart(1)">← Part 1</button>
+            <span style="font-size:13px;color:#999;font-weight:600;">1 of 1 prompt</span>
+            <button class="nav-btn next" onclick="switchPart(3)">Part 3 →</button>
+        </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────
+         PART 3 — Two-way Discussion
+    ───────────────────────────────────────────────────────── -->
+    <div class="content-card hidden" id="card-part-3">
+        <div class="card-header">
+            <div class="card-header-left">
+                <span class="card-part-label">Part 3</span>
+                <span class="card-part-title">Two-way Discussion</span>
+            </div>
+            <span class="card-duration-badge">⏱ 4–5 minutes</span>
+        </div>
+
+        <div class="card-body">
+            <div class="topic-progress" id="p3-progress">Question 1 of 5</div>
+
+            <!-- Q1 -->
+            <div class="question-block active" id="p3-q1">
+                <span class="p3-theme-tag">🎬 Cinema vs Home</span>
+                <p class="p3-question">What are the differences between watching a movie at home and in a cinema?</p>
+                <p class="p3-hint">Consider: atmosphere, cost, convenience, sound and picture quality, social experience.</p>
+            </div>
+
+            <!-- Q2 -->
+            <div class="question-block" id="p3-q2">
+                <span class="p3-theme-tag">🎬 Future of Cinema</span>
+                <p class="p3-question">Do you think cinemas will still be popular in the future?</p>
+                <p class="p3-hint">Think about: streaming services, ticket prices, the cinema experience, new technologies like VR.</p>
+            </div>
+
+            <!-- Q3 -->
+            <div class="question-block" id="p3-q3">
+                <span class="p3-theme-tag">🎭 Media Influence</span>
+                <p class="p3-question">Do movies have a strong influence on the way people think?</p>
+                <p class="p3-hint">Consider: values, stereotypes, social norms, political messages, cultural awareness.</p>
+            </div>
+
+            <!-- Q4 -->
+            <div class="question-block" id="p3-q4">
+                <span class="p3-theme-tag">🏛️ Government &amp; Arts</span>
+                <p class="p3-question">Should the government provide financial support to the local film industry?</p>
+                <p class="p3-hint">Think about: cultural heritage, job creation, competition with foreign films, economic return.</p>
+            </div>
+
+            <!-- Q5 -->
+            <div class="question-block" id="p3-q5">
+                <span class="p3-theme-tag">📽️ Film Industry Changes</span>
+                <p class="p3-question">How have movies changed in your country over the last few decades?</p>
+                <p class="p3-hint">Consider: themes, technology, budgets, international influence, audience tastes.</p>
+            </div>
+
+            <!-- Record section -->
+            <div class="record-section">
+                <div class="waveform" id="waveform-p3">
+                    <div class="waveform-bar" style="height:6px"></div>
+                    <div class="waveform-bar" style="height:14px"></div>
+                    <div class="waveform-bar" style="height:24px"></div>
+                    <div class="waveform-bar" style="height:20px"></div>
+                    <div class="waveform-bar" style="height:28px"></div>
+                    <div class="waveform-bar" style="height:18px"></div>
+                    <div class="waveform-bar" style="height:12px"></div>
+                    <div class="waveform-bar" style="height:22px"></div>
+                    <div class="waveform-bar" style="height:26px"></div>
+                    <div class="waveform-bar" style="height:16px"></div>
+                    <div class="waveform-bar" style="height:20px"></div>
+                    <div class="waveform-bar" style="height:28px"></div>
+                    <div class="waveform-bar" style="height:24px"></div>
+                    <div class="waveform-bar" style="height:18px"></div>
+                    <div class="waveform-bar" style="height:14px"></div>
+                    <div class="waveform-bar" style="height:22px"></div>
+                    <div class="waveform-bar" style="height:16px"></div>
+                    <div class="waveform-bar" style="height:10px"></div>
+                    <div class="waveform-bar" style="height:6px"></div>
+                </div>
+                <button class="record-btn" id="record-btn-p3" onclick="toggleRecord('p3')" title="Press to record your answer">
+                    <span class="rec-icon">🎙</span>
+                    <span class="stop-icon">⏹</span>
+                </button>
+                <span class="record-label" id="record-label-p3">Tap to Record</span>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <button class="nav-btn prev" id="p3-prev" onclick="p3Prev()">← Previous</button>
+            <div class="question-dots" id="p3-dots">
+                <div class="q-dot active"></div>
+                <div class="q-dot"></div>
+                <div class="q-dot"></div>
+                <div class="q-dot"></div>
+                <div class="q-dot"></div>
+            </div>
+            <button class="nav-btn next" id="p3-next" onclick="p3Next()">Next →</button>
+        </div>
+    </div>
+
+</div><!-- /main-container -->
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CUSTOM CONTEXT MENU
+═══════════════════════════════════════════════════════════════ -->
+<div id="contextMenu" class="context-menu">
+    <div class="context-menu-item" id="menu-highlight" onclick="doHighlight()">✏️ Highlight</div>
+    <div class="context-menu-item" id="menu-clear"     onclick="doClearHighlight()">🧹 Clear Highlight</div>
+    <div class="context-menu-item"                     onclick="doOpenNote()">📝 Notes</div>
+</div>
+
+<!-- Notes panel -->
+<div class="notes-panel" id="notesPanel">
+    <div class="notes-header" id="notesHeader">
+        <span>📝 My Notes</span>
+        <button class="notes-close" id="notesClose">×</button>
+    </div>
+    <div class="notes-body">
+        <textarea class="notes-textarea" id="notesTextarea" placeholder="Jot down key words, phrases or ideas…" spellcheck="false"></textarea>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════════ -->
+<script>
+(function () {
+    'use strict';
+
+    // ── STATE ───────────────────────────────────────────────────
+    let isExamMode    = false;
+    let timerSeconds  = 14 * 60;   // 14-min outer shell timer
+    let timerInterval = null;
+    let timerRunning  = false;
+
+    // Part 1 navigation — 2 topics
+    let p1Current = 1;
+    const P1_TOTAL = 2;
+    const p1Topics = ['Accommodation', 'Typing'];
+
+    // Part 2 prep timer
+    let prepInterval = null;
+    let prepSeconds  = 60;
+    let prepRunning  = false;
+
+    // Part 3 navigation — 5 questions
+    let p3Current = 1;
+    const P3_TOTAL = 5;
+
+    // Record state per-part
+    const recState     = { p1: false, p2: false, p3: false };
+    const recIntervals = {};
+
+    // Context menu
+    let lastSel   = null;
+    let ctxTarget = null;
+
+    // ── TIMER ───────────────────────────────────────────────────
+    const timerDisplay = document.getElementById('timer-display');
+    const toggleBtn    = document.getElementById('timer-toggle-btn');
+    const resetBtn     = document.getElementById('timer-reset-btn');
+
+    const PLAY_SVG  = `<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>`;
+    const PAUSE_SVG = `<svg viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>`;
+
+    function renderTimer() {
+        const m = Math.floor(timerSeconds / 60);
+        const s = timerSeconds % 60;
+        timerDisplay.textContent =
+            `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+        if (timerSeconds <= 120) timerDisplay.classList.add('urgent');
+    }
+
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerRunning = true;
+        toggleBtn.innerHTML = PAUSE_SVG;
+        timerInterval = setInterval(() => {
+            timerSeconds--;
+            renderTimer();
+            if (timerSeconds <= 0) {
+                clearInterval(timerInterval);
+                timerRunning = false;
+                timerDisplay.textContent = '00:00';
+                if (isExamMode) {
+                    alert('⏰ Time is up! The Speaking test has ended.');
+                }
+            }
+        }, 1000);
+    }
+
+    function pauseTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timerRunning = false;
+        toggleBtn.innerHTML = PLAY_SVG;
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        if (isExamMode) return;
+        timerRunning ? pauseTimer() : startTimer();
+    });
+
+    resetBtn.addEventListener('click', () => {
+        if (isExamMode) return;
+        pauseTimer();
+        timerSeconds = 14 * 60;
+        renderTimer();
+        timerDisplay.classList.remove('urgent');
+        toggleBtn.innerHTML = PLAY_SVG;
+    });
+
+    // ── PRE-TEST MODAL ──────────────────────────────────────────
+    document.getElementById('btn-exam-mode').addEventListener('click', () => {
+        isExamMode = true;
+        document.body.classList.add('exam-mode');
+        document.getElementById('pretest-overlay').style.display = 'none';
+        startTimer();
+    });
+
+    document.getElementById('btn-practice-mode').addEventListener('click', () => {
+        document.getElementById('pretest-overlay').style.display = 'none';
+        startTimer();
+    });
+
+    // ── BACK BUTTON ─────────────────────────────────────────────
+    document.getElementById('back-btn').addEventListener('click', () => {
+        const leave = confirm('Are you sure you want to quit? Your progress will not be saved.');
+        if (leave) window.location.href = 'index.html';
+    });
+
+    // ── PART SWITCHING ──────────────────────────────────────────
+    window.switchPart = function (num) {
+        ['1','2','3'].forEach(n => {
+            document.getElementById(`card-part-${n}`).classList.add('hidden');
+        });
+        document.getElementById(`card-part-${num}`).classList.remove('hidden');
+
+        document.querySelectorAll('.part-pill').forEach(p => {
+            p.classList.toggle('active', parseInt(p.dataset.part) === num);
+        });
+
+        // Stop any active recording when switching parts
+        Object.keys(recState).forEach(k => {
+            if (recState[k]) toggleRecord(k);
+        });
+    };
+
+    // ── PART 1 NAVIGATION ───────────────────────────────────────
+    function renderP1() {
+        for (let i = 1; i <= P1_TOTAL; i++) {
+            document.getElementById(`p1-q${i}`).classList.toggle('active', i === p1Current);
+        }
+        document.getElementById('p1-progress').innerHTML =
+            `Topic ${p1Current} of ${P1_TOTAL} · ${p1Topics[p1Current - 1]}`;
+
+        document.getElementById('p1-prev').disabled = (p1Current === 1);
+        document.getElementById('p1-next').disabled = (p1Current === P1_TOTAL);
+        document.getElementById('p1-next').textContent =
+            p1Current === P1_TOTAL ? 'Go to Part 2 →' : 'Next →';
+
+        // Dots
+        const dots = document.querySelectorAll('#p1-dots .q-dot');
+        dots.forEach((d, i) => {
+            d.classList.remove('active', 'visited');
+            if (i + 1 === p1Current)     d.classList.add('active');
+            else if (i + 1 < p1Current) d.classList.add('visited');
+        });
+    }
+
+    window.p1Next = function () {
+        if (p1Current < P1_TOTAL) { p1Current++; renderP1(); }
+        else switchPart(2);
+    };
+    window.p1Prev = function () {
+        if (p1Current > 1) { p1Current--; renderP1(); }
+    };
+
+    // ── PART 2 PREP TIMER ───────────────────────────────────────
+    window.startPrepTimer = function () {
+        if (prepRunning) return;
+        const btn  = document.getElementById('prep-start-btn');
+        const disp = document.getElementById('prep-display');
+        btn.disabled = true;
+        btn.textContent = '⏳ Preparing…';
+        prepSeconds = 60;
+        prepRunning = true;
+
+        disp.classList.add('running');
+        prepInterval = setInterval(() => {
+            prepSeconds--;
+            const m = Math.floor(prepSeconds / 60);
+            const s = prepSeconds % 60;
+            disp.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+            if (prepSeconds <= 0) {
+                clearInterval(prepInterval);
+                prepRunning = false;
+                disp.textContent = 'Done!';
+                disp.classList.remove('running');
+                disp.classList.add('done');
+                btn.textContent = '✓ Start Speaking';
+                btn.style.background = '#28a745';
+                btn.disabled = false;
+                btn.onclick = null; // prevent restart
+            }
+        }, 1000);
+    };
+
+    // ── PART 3 NAVIGATION ───────────────────────────────────────
+    function renderP3() {
+        for (let i = 1; i <= P3_TOTAL; i++) {
+            document.getElementById(`p3-q${i}`).classList.toggle('active', i === p3Current);
+        }
+        document.getElementById('p3-progress').textContent =
+            `Question ${p3Current} of ${P3_TOTAL}`;
+
+        document.getElementById('p3-prev').disabled = (p3Current === 1);
+        const nextBtn = document.getElementById('p3-next');
+        nextBtn.disabled = (p3Current === P3_TOTAL);
+        nextBtn.textContent = p3Current === P3_TOTAL ? '✓ End' : 'Next →';
+
+        const dots = document.querySelectorAll('#p3-dots .q-dot');
+        dots.forEach((d, i) => {
+            d.classList.remove('active', 'visited');
+            if (i + 1 === p3Current)     d.classList.add('active');
+            else if (i + 1 < p3Current) d.classList.add('visited');
+        });
+    }
+
+    window.p3Next = function () {
+        if (p3Current < P3_TOTAL) { p3Current++; renderP3(); }
+    };
+    window.p3Prev = function () {
+        if (p3Current > 1) { p3Current--; renderP3(); }
+    };
+
+    // ── RECORD BUTTON ───────────────────────────────────────────
+    window.toggleRecord = function (part) {
+        const btn      = document.getElementById(`record-btn-${part}`);
+        const waveform = document.getElementById(`waveform-${part}`);
+        const label    = document.getElementById(`record-label-${part}`);
+
+        recState[part] = !recState[part];
+
+        if (recState[part]) {
+            btn.classList.add('recording');
+            waveform.classList.add('visible');
+            label.textContent = '● Recording…';
+            label.classList.add('active');
+        } else {
+            btn.classList.remove('recording');
+            waveform.classList.remove('visible');
+            label.textContent = 'Tap to Record';
+            label.classList.remove('active');
+            if (recIntervals[part]) {
+                clearInterval(recIntervals[part]);
+                delete recIntervals[part];
+            }
+        }
+    };
+
+    // ── CONTEXT MENU ────────────────────────────────────────────
+    const ctxMenu = document.getElementById('contextMenu');
+
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        lastSel   = window.getSelection();
+        ctxTarget = e.target;
+
+        const hasSel   = lastSel && !lastSel.isCollapsed && lastSel.toString().trim().length > 0;
+        const onHighlt = !!e.target.closest('.highlight');
+
+        document.getElementById('menu-highlight').style.display = hasSel    ? 'flex' : 'none';
+        document.getElementById('menu-clear').style.display      = onHighlt ? 'flex' : 'none';
+
+        const mW = 168, mH = 120;
+        let lft = e.clientX, top = e.clientY;
+        if (lft + mW > window.innerWidth)  lft = window.innerWidth  - mW - 8;
+        if (top + mH > window.innerHeight) top = window.innerHeight - mH - 8;
+
+        ctxMenu.style.left    = `${lft}px`;
+        ctxMenu.style.top     = `${top}px`;
+        ctxMenu.style.display = 'block';
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!ctxMenu.contains(e.target)) ctxMenu.style.display = 'none';
+    });
+
+    window.doHighlight = function () {
+        ctxMenu.style.display = 'none';
+        if (!lastSel || lastSel.isCollapsed) return;
+        const range = lastSel.getRangeAt(0);
+
+        // Only highlight inside content cards (not the textarea / notes)
+        const card = range.commonAncestorContainer.parentElement?.closest('.content-card');
+        if (!card) return;
+
+        try {
+            const span = document.createElement('span');
+            span.className = 'highlight';
+            range.surroundContents(span);
+        } catch (_) {
+            const frag = range.extractContents();
+            const span = document.createElement('span');
+            span.className = 'highlight';
+            span.appendChild(frag);
+            range.insertNode(span);
+        }
+        window.getSelection().removeAllRanges();
+    };
+
+    window.doClearHighlight = function () {
+        ctxMenu.style.display = 'none';
+        const hl = ctxTarget?.closest('.highlight');
+        if (!hl) return;
+        const parent = hl.parentNode;
+        while (hl.firstChild) parent.insertBefore(hl.firstChild, hl);
+        parent.removeChild(hl);
+        parent.normalize();
+    };
+
+    window.doOpenNote = function () {
+        ctxMenu.style.display = 'none';
+        document.getElementById('notesPanel').classList.add('visible');
+        document.getElementById('notesTextarea').focus();
+    };
+
+    // Close notes panel
+    document.getElementById('notesClose').addEventListener('click', () => {
+        document.getElementById('notesPanel').classList.remove('visible');
+    });
+
+    // Draggable notes panel
+    (function makeDraggable(panel, handle) {
+        let ox=0, oy=0, mx=0, my=0;
+        handle.addEventListener('mousedown', e => {
+            e.preventDefault();
+            mx = e.clientX; my = e.clientY;
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stop);
+        });
+        function drag(e) {
+            ox = mx - e.clientX; oy = my - e.clientY;
+            mx = e.clientX;      my = e.clientY;
+            panel.style.top   = (panel.offsetTop  - oy) + 'px';
+            panel.style.left  = (panel.offsetLeft - ox) + 'px';
+            panel.style.right = 'auto';
+        }
+        function stop() {
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stop);
+        }
+    })(document.getElementById('notesPanel'), document.getElementById('notesHeader'));
+
+    // ── INIT ────────────────────────────────────────────────────
+    renderP1();
+    renderP3();
+    renderTimer();
+
+})();
+</script>
+</body>
+</html>

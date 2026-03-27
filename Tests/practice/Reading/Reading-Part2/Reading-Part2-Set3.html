@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading — Part 2 | Set 3 | IELTSPRACTICE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            line-height: 1.4;
+            font-size: 16px;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background-color: #ffffff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            height: 60px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .ielts-logo {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #1a1a2e;
+            text-decoration: none;
+            gap: 6px;
+        }
+
+        .ielts-logo-badge {
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .part-badge {
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .test-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .timer-container {
+            display: flex;
+            position: relative;
+            cursor: default;
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            align-items: center;
+        }
+
+        .timer-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 15px;
+        }
+
+        .timer-controls button {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            padding: 0;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .timer-controls button:hover { background: #e0e0e0; }
+        .timer-controls button svg { width: 20px; height: 20px; fill: #333; }
+        .timer-display.urgent { color: #dc3545; font-weight: 700; }
+
+        /* ── LAYOUT ── */
+        .main-container {
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            height: calc(100vh - 60px);
+            position: relative;
+        }
+
+        .part-header {
+            background-color: #f1f2ec;
+            padding: 15px 20px;
+            border: 1px solid #e0e0e0;
+            text-align: left;
+            margin: 10px 20px;
+            border-radius: 5px;
+        }
+        .part-header p { margin: 0; }
+        .part-header p:first-child { margin-bottom: 5px; }
+
+        .panels-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .passage-panel {
+            flex: 1;
+            padding: 20px 20px 100px;
+            overflow-y: auto;
+            min-width: 200px;
+        }
+
+        .passage-panel::-webkit-scrollbar { width: 8px; background: transparent; }
+        .passage-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+
+        /* ── RESIZER ── */
+        .resizer {
+            position: relative;
+            background: transparent;
+            cursor: col-resize;
+            flex-shrink: 0;
+            flex-grow: 0;
+            z-index: 5;
+            width: 16px;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .resizer::before {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0; left: 50%;
+            width: 3px;
+            transform: translateX(-50%);
+            background-color: #3e3e3e;
+        }
+        .resizer::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 36px; height: 36px;
+            background-color: #ffffff;
+            border: 2px solid #3e3e3e;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="%233e3e3e" fill="%233e3e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><line x1="4" y1="12" x2="20" y2="12"/></svg>');
+            background-repeat: no-repeat;
+            background-size: 60% 60%;
+            background-position: center;
+            pointer-events: none;
+        }
+
+        /* ── QUESTIONS PANEL ── */
+        .questions-panel {
+            flex: 1;
+            padding: 20px 20px 100px;
+            overflow-y: auto;
+            min-width: 200px;
+            border-left: 1px solid #e0e0e0;
+        }
+        .questions-panel::-webkit-scrollbar { width: 8px; background: transparent; }
+        .questions-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+
+        /* ── PASSAGE TEXT ── */
+        .reading-passage h4 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .reading-passage p { margin-bottom: 1.2em; }
+
+        /* Drop zone styling (used in passage for heading matching) */
+        .passage-drop-zone {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            min-height: 34px;
+            border: 2px dashed #aaa;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            color: #aaa;
+            font-weight: bold;
+            padding: 4px 8px;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .passage-drop-zone.drag-over { background-color: #e6f4ff; border-color: #4a90e2; }
+        .passage-drop-zone.filled {
+            background-color: transparent;
+            border: none !important;
+            padding: 0;
+        }
+        .passage-drop-zone.filled .drag-item {
+            width: auto; height: auto;
+            display: inline-block;
+            border: 2px solid #4a90e2;
+            border-radius: 10px;
+            padding: 4px 10px;
+            font-weight: 700;
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(74,144,226,0.15);
+            cursor: default;
+            white-space: nowrap;
+        }
+        .passage-drop-zone.correct { background-color: #e9f7ef; border: 2px solid #28a745; border-radius: 4px; }
+        .passage-drop-zone.incorrect { background-color: #f8d7da; border: 2px solid #dc3545; border-radius: 4px; }
+
+        /* ── DRAG ITEMS ── */
+        .drag-item {
+            background: white;
+            border: 1px solid #9c9c9c;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: move;
+            font-size: 15px;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        .drag-item:hover { background: #e9ecef; }
+        .drag-item.dragging { opacity: 0.5; }
+
+        .drag-options-bank {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fafafa;
+        }
+
+        /* ── QUESTION ELEMENTS ── */
+        .question { margin-bottom: 40px; }
+        .question p { margin-bottom: 10px; }
+        .question-prompt { margin-bottom: 20px; }
+
+        .answer-input {
+            border: 1px solid #bfbfbf;
+            border-radius: 4px;
+            background-color: #fff;
+            padding: 2px 8px;
+            font-size: 16px;
+            font-weight: 700;
+            margin-right: 6px;
+            margin-left: 6px;
+            height: 28px;
+            min-width: 150px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            z-index: 10;
+            position: relative;
+            pointer-events: auto;
+        }
+        .answer-input:focus, .answer-input.active-input {
+            border-color: #3581d8;
+            border-width: 2px;
+            outline: none;
+        }
+        .answer-input::placeholder { color: #666; font-weight: 700; text-align: center; }
+        .answer-input.correct { border-color: #28a745; background-color: #e9f7ef; }
+        .answer-input.incorrect { border-color: #dc3545; background-color: #f8d7da; color: #721c24; }
+
+        .correct-answer-display {
+            display: inline-block;
+            font-size: 14px;
+            color: #28a745;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+        .correct-answer-highlight { background-color: #d4edda; border-color: #28a745 !important; color: #155724; }
+
+        /* Summary text line height */
+        .summary-text p { line-height: 3.0; font-size: 16px; margin-bottom: 12px; }
+
+        /* ── NAVIGATION ARROWS ── */
+        .nav-arrows {
+            position: fixed;
+            bottom: 100px; right: 20px;
+            display: flex; gap: 6px;
+            z-index: 101;
+        }
+        .nav-arrow {
+            width: 48px; height: 48px;
+            border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 700; color: #fff;
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+            outline: none;
+        }
+        .nav-arrow.prev { background-color: #4b5563; }
+        .nav-arrow.next { background-color: #000000; }
+        .nav-arrow:hover { transform: translateY(-1px); }
+        .nav-arrow:active { transform: translateY(0); }
+        .nav-arrow:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── BOTTOM NAV ── */
+        .nav-row {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
+            padding: 0 0 0 20px;
+            display: flex;
+            align-items: center;
+            height: 80px;
+            z-index: 100;
+            gap: 4px;
+            overflow-x: auto;
+        }
+
+        .subQuestion {
+            width: 32px; height: 32px;
+            border: 1px solid #ccc;
+            background: white;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        .subQuestion.answered { background-color: #e9ecef; border-color: #ddd; }
+        .subQuestion.correct { background-color: #28a745; color: white; border-color: #28a745; }
+        .subQuestion.incorrect { background-color: #dc3545; color: white; border-color: #dc3545; }
+        .subQuestion:hover { background-color: #f0f0f0; border-color: #999; }
+        .subQuestion.active { background-color: #4a90e2; color: white; border-color: #4a90e2; }
+
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0;
+            margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+            white-space: nowrap; border: 0;
+        }
+
+        .footer__deliverButton___3FM07 {
+            margin-left: auto;
+            margin-right: 20px;
+            flex-shrink: 0;
+            background-color: #f3f4f6;
+            color: #111827;
+            border: 1px solid #d1d5db;
+            padding: 10px 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.08s ease, background-color 0.2s ease;
+            min-width: 160px;
+            justify-content: center;
+        }
+        .footer__deliverButton___3FM07:hover { background-color: #ebedf0; border-color: #c7ccd4; }
+        .footer__deliverButton___3FM07:active { transform: translateY(1px); }
+        .footer__deliverButton___3FM07:disabled {
+            background: #eef0f3; color: #9ca3af;
+            cursor: not-allowed; border-color: #e5e7eb;
+        }
+
+        /* ── CONTEXT MENU ── */
+        .context-menu {
+            position: fixed;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: none;
+            min-width: 140px;
+        }
+        .context-menu-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .context-menu-item:hover { background-color: #f8f9fa; }
+        .context-menu-item:last-child { border-bottom: none; }
+
+        .highlight { background-color: #ffff00; }
+        .comment-highlight {
+            background-color: #90EE90;
+            position: relative;
+            cursor: help;
+        }
+        .comment-tooltip {
+            position: absolute;
+            bottom: 100%; left: 50%;
+            transform: translateX(-50%);
+            background: #333; color: white;
+            padding: 8px 12px;
+            border-radius: 4px; font-size: 14px;
+            white-space: nowrap; z-index: 1000;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .comment-highlight:hover .comment-tooltip { opacity: 1; }
+
+        /* ── NOTE MODAL ── */
+        .note-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 3000;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .note-modal-overlay.hidden { display: none; }
+        .note-modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 380px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .note-modal-content h3 { margin-bottom: 12px; font-size: 16px; }
+        .note-modal-content textarea {
+            width: 100%; height: 100px;
+            border: 1px solid #ccc; border-radius: 4px;
+            padding: 8px; font-size: 14px; resize: vertical;
+        }
+        .note-modal-buttons { display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; }
+        .note-modal-buttons button {
+            padding: 8px 16px; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 600; font-size: 14px;
+        }
+        .note-btn-save { background: #4a90e2; color: white; }
+        .note-btn-cancel { background: #f3f4f6; color: #333; }
+
+        /* ── RESULTS MODAL ── */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(17,24,39,0.6);
+            backdrop-filter: blur(3px);
+            z-index: 2000;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .modal-overlay.hidden { display: none; }
+        .modal-content {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 14px;
+            width: 92%; max-width: 780px; max-height: 86vh;
+            display: flex; flex-direction: column;
+            position: relative;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+        .modal-close-btn {
+            position: absolute; top: 10px; right: 15px;
+            background: none; border: none;
+            font-size: 28px; cursor: pointer; color: #666;
+        }
+        .modal-content h2 { text-align: center; margin-bottom: 18px; color: #111827; font-size: 22px; }
+        .results-summary { text-align: center; margin-bottom: 18px; font-size: 16px; }
+        .results-summary p { margin-bottom: 8px; }
+        .results-summary span { font-weight: 700; font-size: 18px; color: #1a1a2e; }
+        .results-details-container { overflow-y: auto; flex: 1; border-top: 1px solid #e5e7eb; }
+        .results-details-header, .result-row {
+            display: grid;
+            grid-template-columns: 60px 1fr 1fr;
+            gap: 10px; padding: 10px 15px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+            align-items: center;
+        }
+        .results-details-header { font-weight: 700; background: #f9fafb; position: sticky; top: 0; }
+        .result-row.incorrect { background-color: #fff5f5; }
+        .result-row .q-num { font-weight: 700; color: #374151; }
+        .result-row .user-ans { color: #6b7280; }
+        .result-row .correct-ans { color: #059669; font-weight: 600; }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 480px) {
+            .passage-panel, .questions-panel { width: 100%; min-width: auto; }
+            .resizer { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── HEADER ── -->
+    <div class="header">
+        <div class="header-left">
+            <a class="ielts-logo" href="#">
+                <span class="ielts-logo-badge">IELTS</span>PRACTICE
+            </a>
+            <span class="part-badge">Reading — Part 2 | Set 3</span>
+        </div>
+        <div class="test-info">
+            <div class="timer-container">
+                <span class="timer-display">20:00</span>
+                <div class="timer-controls">
+                    <button id="timer-toggle-btn" title="Pause/Resume Timer">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M8 5v14l11-7L8 5z"/>
+                        </svg>
+                    </button>
+                    <button id="timer-reset-btn" title="Reset Timer">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── MAIN ── -->
+    <div class="main-container" id="main-container">
+        <div class="part-header">
+            <p><strong>Part 2</strong></p>
+            <p>Read the text and answer questions 14–26.</p>
+        </div>
+        <div class="panels-container">
+
+            <!-- ── PASSAGE ── -->
+            <div class="passage-panel" id="passage-panel">
+                <div class="reading-passage">
+                    <h4 class="text-center">Western Immigration of Canada</h4>
+
+                    <!-- Example: Paragraph A heading (pre-filled) -->
+                    <div style="margin-bottom:10px; display:flex; align-items:center; border:2px solid #4a90e2; border-radius:4px; background-color:#e6f4ff; color:#4a90e2; font-weight:bold; padding:4px 8px; pointer-events:none;">
+                        <span>ix. Demand of western immigration</span>
+                    </div>
+                    <p><strong>A</strong>&nbsp;&nbsp;By the mid-1870s Canada wanted an immigrant population of agricultural settlers established in the West. No urban centres existed on the prairies in the 1870s, and rural settlement was the focus of the federal government's attention. The western rural settlement was desired, as it would provide homesteads for the sons and daughters of eastern farmers, as eastern agricultural land filled to capacity. As well, eastern farmers and politicians viewed western Canada, with its broad expanses of unpopulated land, as a prime location for expanding Canada's agricultural output, especially in terms of wheat production to serve the markets of eastern Canada.</p>
+
+                    <div class="passage-drop-zone" data-q-start="14" data-dnd-group="p2-headings" id="dz-14"></div>
+                    <p><strong>B</strong>&nbsp;&nbsp;To bolster Canada's population and agricultural output, the federal government took steps to secure western land. The Dominion of Canada purchased Rupert's Land from the Hudson's Bay Company in 1870. In 1872, the federal government enacted the Dominion Lands Act. This act enabled settlers to acquire 160 acres of free land, as long as settlers remained on their land for a period of three years, made certain minor improvements to the land, and paid a $10.00 registration fee. The Canadian government also created a Mounted Police Force in 1873. The Mounties journeyed west to secure the area for future settlers. By 1876 the NWMP had established themselves in the West. The major posts included Swan River, Fort Saskatchewan, Fort Calgary, Fort Walsh and Fort Macleod. All of these initiatives attracted a number of eastern-Canadian settlers, as well as European and American immigrants, to Canada's West, and particularly to the area of Manitoba.</p>
+
+                    <div class="passage-drop-zone" data-q-start="15" data-dnd-group="p2-headings" id="dz-15"></div>
+                    <p><strong>C</strong>&nbsp;&nbsp;The surest way to protect Canadian territory, and to achieve the secondary goal for joining British Columbia to the rest of the country, was to import large numbers of Eastern Canadian and British settlers. Settling the West also made imperative the building of a transcontinental railway. The railway would work to create an east-west economy, in which western Canada would feed the growing urban industrial population of the east, and in return become a market for eastern Canadian manufactured goods.</p>
+
+                    <div class="passage-drop-zone" data-q-start="16" data-dnd-group="p2-headings" id="dz-16"></div>
+                    <p><strong>D</strong>&nbsp;&nbsp;Winnipeg became the metropolis of the West during this period. Winnipeg's growth before 1900 was the result of a combination of land speculation, growth of housing starts, and the federal government's selection in 1881 of Winnipeg as a major stop along the CPR. This decision culminated in a land boom between 1881 and 1883 which resulted in the transformation of hamlets like Portage la Prairie and Brandon into towns, and a large increase in Manitoba's population. Soon, Winnipeg stood at the junction of three transcontinental railway lines which employed thousands in rail yards. Winnipeg also became the major processor of agricultural products for the surrounding hinterland.</p>
+
+                    <div class="passage-drop-zone" data-q-start="17" data-dnd-group="p2-headings" id="dz-17"></div>
+                    <p><strong>E</strong>&nbsp;&nbsp;The majority of settlers to Winnipeg, and the surrounding countryside, during this early period, were primarily Protestant English-speaking settlers from Ontario and the British Isles. These settlers established Winnipeg upon a British-Ontarian ethos which came to dominate the society's social, political, and economic spirit. This British-Ontarian ethnic homogeneity, however, did not last very long. Increasing numbers of foreign immigrants, especially from Austria-Hungary and Ukraine soon added a new ethnic element to the recent British, the older First Nation Métis, and Selkirk's settler population base. Settling the West with (in particular) Eastern Canadians and British immigrants offered the advantage of safeguarding the 49th parallel from the threat of American take-over, had not the Minnesota legislature passed a resolution which provided for the annexation of the Red River district. The Red River in 1870 was the most important settlement on the Canadian prairies. It contained 11,963 inhabitants of whom 9,700 were Métis and First Nations. But neighbouring Minnesota already had a population of over 100,000.</p>
+
+                    <div class="passage-drop-zone" data-q-start="18" data-dnd-group="p2-headings" id="dz-18"></div>
+                    <p><strong>F</strong>&nbsp;&nbsp;Not all of the settlers who came to western Canada in the 1880s, however, desired to remain there. In the 1870s and 1880s, economic depression kept the value of Canada's staple exports low, which discouraged many from permanent settlement in the West. Countries including Brazil, Argentina, Australia, New Zealand and the United States competed with Canada for immigrants. Many immigrants and thousands of Canadians chose to settle in the accessible and attractive American frontier. Canada before 1891 has been called "a huge demographic railway station" where thousands of men, women, and children were constantly going and coming, and where the number of departures invariably exceeded that of arrivals.</p>
+
+                    <div class="passage-drop-zone" data-q-start="19" data-dnd-group="p2-headings" id="dz-19"></div>
+                    <p><strong>G</strong>&nbsp;&nbsp;By 1891 Eastern Canada had its share of both large urban centres and problems associated with city life. While the booming economic centres of Toronto and Montreal were complete with electricity and telephones in the cities' wealthiest areas by the turn of the century, slum conditions characterised the poorest areas like the district known as 'the Ward' in Toronto. Chickens and pigs ran through the streets; privy buckets spilled onto backyards and lanes creating cesspools in urban slums. These same social reformers believed that rural living, in stark contrast to urban, would lead to a healthy, moral, and charitable way of life. Social reformers praised the ability of fresh air, hard work, and open spaces for 'Canadianizing' immigrants. Agricultural pursuits were seen as especially fitting for attaining this 'moral' and family-oriented way of life, in opposition to the single male-dominated atmosphere of the cities. Certainly, agriculture played an important part in the Canadian economy in 1891. One-third of the workforce worked on farms.</p>
+
+                    <div class="passage-drop-zone" data-q-start="20" data-dnd-group="p2-headings" id="dz-20"></div>
+                    <p><strong>H</strong>&nbsp;&nbsp;The Canadian government presented Canada's attractions to potential overseas migrants in several ways. The government offered free or cheap land to potential agriculturists. As well, the government established agents and/or agencies for the purpose of attracting emigrants overseas. Assisted passage schemes, bonuses and commissions to agents and settlers and pamphlets also attracted some immigrants to Canada. The most influential form of attracting others to Canada, however, remained the letters home written by emigrants already in Canada. Letters from trusted friends and family members often contained exaggerations of the 'wonder of the new world.' Migrant workers and settlers already in Canada did not want to disappoint, or worry, their family and friends at home. Embellished tales of good fortune and happiness often succeeded in encouraging others to come.</p>
+                </div>
+            </div>
+
+            <!-- RESIZER -->
+            <div class="resizer" id="resizer"></div>
+
+            <!-- ── QUESTIONS ── -->
+            <div class="questions-panel" id="questions-panel">
+                <div class="questions-container">
+
+                    <!-- Q 14–20: Matching Headings (Drag & Drop) -->
+                    <div class="question" data-q-start="14" data-q-end="20">
+                        <div class="question-prompt">
+                            <p><strong>Questions 14–20</strong></p>
+                            <p>The Reading Passage has eight paragraphs <strong>A–H</strong>.</p>
+                            <p>Choose the correct heading for paragraphs <strong>B–H</strong> from the list below.</p>
+                            <p>Drag and drop the headings into the boxes above each paragraph in the passage.</p>
+                            <p><strong>List of Headings</strong></p>
+                        </div>
+                        <div class="drag-options-bank" id="drag-bank">
+                            <div class="drag-item" draggable="true" data-dnd-group="p2-headings" data-value="i">i. Not all would stay in Canada forever</div>
+                            <div class="drag-item" draggable="true" data-dnd-group="p2-headings" data-value="ii">ii. Government's safeguard in the West</div>
+                            <div class="drag-item" draggable="true" data-dnd-group="p2-headings" data-value="iii">iii. Eastern Canada is full</div>
+                            <div class="drag-item" draggable="true" data-dnd-group="p2-headings" data-value="iv">iv. Built-up to the new infrastructure</div>
+                            <div class="drag-item" draggable="true" data-dnd-group="p2-headings" data-value="v">v. An exclusive British domination in Ontario established ever since</div>
+                            <div class="drag-item" draggable="true" data-dnd-group="p2-headings" data-value="vi">vi. Ethnics and language make-up</div>
+                            <div class="drag-item" draggable="true" data-dnd-group="p2-headings" data-value="vii">vii. Pursuing a pure life</div>
+                            <div class="drag-item" draggable="true" data-dnd-group="p2-headings" data-value="viii">viii. Police recruited from mid-class families</div>
+                            <div class="drag-item" draggable="true" data-dnd-group="p2-headings" data-value="x">x. Early major urban development of the West</div>
+                            <div class="drag-item" draggable="true" data-dnd-group="p2-headings" data-value="xi">xi. Attracting urban environment</div>
+                            <div class="drag-item" draggable="true" data-dnd-group="p2-headings" data-value="xii">xii. Advertising of Western Canada</div>
+                        </div>
+                    </div>
+
+                    <!-- Q 21–26: Summary Completion -->
+                    <div class="question" data-q-start="21" data-q-end="26">
+                        <div class="question-prompt">
+                            <p><strong>Questions 21–26</strong></p>
+                            <p>Complete the summary. Write <strong>NO MORE THAN TWO WORDS</strong> from the text for each answer.</p>
+                        </div>
+                        <div class="summary-text">
+                            <p>With the saturation of Eastern Canada, the Western rural area would supply <input type="text" class="answer-input" id="q21" placeholder="21" autocomplete="off"> for the descendants of easterners. Politicians also declared that the West had potential to increase <input type="text" class="answer-input" id="q22" placeholder="22" autocomplete="off"> of Canada according to <input type="text" class="answer-input" id="q23" placeholder="23" autocomplete="off"> crop that was consumed in the East. The federal government started to prepare and made it happen. First, the government bought land from a private <input type="text" class="answer-input" id="q24" placeholder="24" autocomplete="off">, and legally offered a certain area to people who stayed for a qualifying period of time. Then, mounted <input type="text" class="answer-input" id="q25" placeholder="25" autocomplete="off"> was founded to secure the land. However, the best way to protect citizens was to build a <input type="text" class="answer-input" id="q26" placeholder="26" autocomplete="off"> to transport migrants and goods between the West and the East.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Arrows -->
+    <div class="nav-arrows">
+        <button class="nav-arrow prev" onclick="previousQuestion()" id="prevBtn" aria-label="Previous question">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+        <button class="nav-arrow next" onclick="nextQuestion()" id="nextBtn" aria-label="Next question">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="nav-row" aria-label="Questions">
+        <button class="subQuestion scorable-item" onclick="goToQuestion(14)"><span class="sr-only">Question 14</span><span aria-hidden="true">14</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(15)"><span class="sr-only">Question 15</span><span aria-hidden="true">15</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(16)"><span class="sr-only">Question 16</span><span aria-hidden="true">16</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(17)"><span class="sr-only">Question 17</span><span aria-hidden="true">17</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(18)"><span class="sr-only">Question 18</span><span aria-hidden="true">18</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(19)"><span class="sr-only">Question 19</span><span aria-hidden="true">19</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(20)"><span class="sr-only">Question 20</span><span aria-hidden="true">20</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(21)"><span class="sr-only">Question 21</span><span aria-hidden="true">21</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(22)"><span class="sr-only">Question 22</span><span aria-hidden="true">22</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(23)"><span class="sr-only">Question 23</span><span aria-hidden="true">23</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(24)"><span class="sr-only">Question 24</span><span aria-hidden="true">24</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(25)"><span class="sr-only">Question 25</span><span aria-hidden="true">25</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(26)"><span class="sr-only">Question 26</span><span aria-hidden="true">26</span></button>
+        <button id="deliver-button" class="footer__deliverButton___3FM07" aria-label="Check your answers">
+            <span>Check Answers</span>
+        </button>
+    </nav>
+
+    <!-- Context Menu -->
+    <div id="contextMenu" class="context-menu">
+        <div id="menu-highlight" class="context-menu-item" onclick="highlightText()">✏️ Highlight</div>
+        <div id="menu-note" class="context-menu-item" onclick="openNoteModal()">📝 Note</div>
+        <div id="menu-clear" class="context-menu-item" onclick="clearHighlight()">🗑️ Clear</div>
+        <div id="menu-clear-all" class="context-menu-item" onclick="clearAllHighlights()">🗑️ Clear All</div>
+    </div>
+
+    <!-- Note Modal -->
+    <div id="noteModal" class="note-modal-overlay hidden">
+        <div class="note-modal-content">
+            <h3>Add Note</h3>
+            <textarea id="noteText" placeholder="Enter your note here..."></textarea>
+            <div class="note-modal-buttons">
+                <button class="note-btn-cancel" onclick="cancelNote()">Cancel</button>
+                <button class="note-btn-save" onclick="saveNote()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="results-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeResultsModal()">&times;</button>
+            <h2>Results — Part 2 | Set 2</h2>
+            <div class="results-summary">
+                <p>Score: <span id="results-score"></span> / 13</p>
+                <p>IELTS Band: <span id="results-band"></span></p>
+            </div>
+            <div class="results-details-header">
+                <span>Q#</span><span>Your Answer</span><span>Correct Answer</span>
+            </div>
+            <div id="results-details" class="results-details-container"></div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // ── STATE ──
+        const FIRST_Q = 14;
+        const LAST_Q  = 26;
+        let currentQuestion = FIRST_Q;
+        let selectedRange   = null;
+        let activeQuestionElement = null;
+        let pendingNoteRange = null;
+        let draggedItem = null;
+
+        // Timer: 20 minutes
+        let timeInSeconds = 1200;
+        let timerInterval = null;
+        let timerRunning  = false;
+
+        // ── CORRECT ANSWERS ──
+        const correctAnswers = {
+            '14': 'ii',
+            '15': 'iv',
+            '16': 'x',
+            '17': 'vi',
+            '18': 'i',
+            '19': 'vii',
+            '20': 'xii',
+            '21': 'homesteads',
+            '22': 'agricultural output',
+            '23': 'wheat',
+            '24': 'company',
+            '25': 'police force',
+            '26': 'transcontinental railway'
+        };
+
+        // Band mapping (out of 13)
+        function getBand(score) {
+            if (score >= 13) return '9.0';
+            if (score >= 12) return '8.5';
+            if (score >= 11) return '8.0';
+            if (score >= 10) return '7.5';
+            if (score >= 9)  return '7.0';
+            if (score >= 8)  return '6.5';
+            if (score >= 7)  return '6.0';
+            if (score >= 6)  return '5.5';
+            if (score >= 5)  return '5.0';
+            if (score >= 4)  return '4.5';
+            if (score >= 3)  return '4.0';
+            return '3.5';
+        }
+
+        // ── DOM REFS ──
+        const timerDisplay   = document.querySelector('.timer-display');
+        const timerToggleBtn = document.getElementById('timer-toggle-btn');
+        const timerResetBtn  = document.getElementById('timer-reset-btn');
+        const deliverButton  = document.getElementById('deliver-button');
+        const resizer        = document.getElementById('resizer');
+        const passagePanel   = document.getElementById('passage-panel');
+        const questionsPanel = document.getElementById('questions-panel');
+        const contextMenu    = document.getElementById('contextMenu');
+
+        const playIcon  = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M8 5v14l11-7L8 5z"/></svg>';
+        const pauseIcon = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+
+        // ── TIMER ──
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerRunning = true;
+            timerInterval = setInterval(() => {
+                timeInSeconds--;
+                const m = Math.floor(timeInSeconds / 60);
+                const s = timeInSeconds % 60;
+                timerDisplay.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                if (timeInSeconds <= 300) timerDisplay.classList.add('urgent');
+                if (timeInSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.textContent = "Time's up!";
+                }
+            }, 1000);
+            timerToggleBtn.innerHTML = pauseIcon;
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            timerToggleBtn.innerHTML = playIcon;
+        }
+
+        timerToggleBtn.addEventListener('click', () => { if (timerRunning) pauseTimer(); else startTimer(); });
+        timerResetBtn.addEventListener('click', () => {
+            timeInSeconds = 1200;
+            timerDisplay.classList.remove('urgent');
+            timerDisplay.textContent = '20:00';
+            startTimer();
+        });
+        startTimer();
+
+        // ── DRAG & DROP ──
+        function initDragAndDrop() {
+            // Items in the bank
+            document.querySelectorAll('.drag-item[data-dnd-group="p2-headings"]').forEach(item => {
+                item.addEventListener('dragstart', e => {
+                    draggedItem = item;
+                    item.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                item.addEventListener('dragend', () => {
+                    item.classList.remove('dragging');
+                    draggedItem = null;
+                });
+            });
+
+            // Drop zones in passage
+            document.querySelectorAll('.passage-drop-zone[data-dnd-group="p2-headings"]').forEach(zone => {
+                zone.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    if (draggedItem && draggedItem.dataset.dndGroup === zone.dataset.dndGroup) {
+                        zone.classList.add('drag-over');
+                    }
+                });
+                zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    if (!draggedItem || draggedItem.dataset.dndGroup !== zone.dataset.dndGroup) return;
+
+                    const sourceContainer = draggedItem.parentElement;
+                    const existingInZone = zone.querySelector('.drag-item');
+
+                    // Swap: move existing item back to bank (or source)
+                    if (existingInZone) {
+                        if (sourceContainer.classList.contains('passage-drop-zone')) {
+                            sourceContainer.appendChild(existingInZone);
+                            if (!sourceContainer.querySelector('.drag-item')) {
+                                sourceContainer.classList.remove('filled');
+                            }
+                        } else {
+                            document.getElementById('drag-bank').appendChild(existingInZone);
+                        }
+                    }
+
+                    // If the dragged item came from another drop zone, clean it
+                    if (sourceContainer.classList.contains('passage-drop-zone')) {
+                        sourceContainer.classList.remove('filled');
+                    }
+
+                    zone.appendChild(draggedItem);
+                    zone.classList.add('filled');
+                    updateAllIndicators();
+                });
+            });
+
+            // Also allow dropping back to the bank
+            const bank = document.getElementById('drag-bank');
+            bank.addEventListener('dragover', e => e.preventDefault());
+            bank.addEventListener('drop', e => {
+                e.preventDefault();
+                if (!draggedItem) return;
+                const src = draggedItem.parentElement;
+                bank.appendChild(draggedItem);
+                if (src && src.classList.contains('passage-drop-zone')) {
+                    src.classList.remove('filled');
+                }
+                updateAllIndicators();
+            });
+        }
+
+        initDragAndDrop();
+
+        // ── NAVIGATION ──
+        function goToQuestion(n) {
+            if (n < FIRST_Q || n > LAST_Q) return;
+            currentQuestion = n;
+
+            if (activeQuestionElement) {
+                activeQuestionElement.classList.remove('active-question', 'active-input');
+            }
+
+            // For DnD questions (14-20): scroll to the matching drop zone in passage
+            if (n >= 14 && n <= 20) {
+                const dz = document.getElementById(`dz-${n}`);
+                if (dz) {
+                    dz.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                // Also highlight the question block in question panel
+                const qBlock = document.querySelector(`.question[data-q-start="14"]`);
+                if (qBlock) { activeQuestionElement = qBlock; }
+            } else {
+                // Text inputs (21-26)
+                const input = document.getElementById(`q${n}`);
+                if (input) {
+                    activeQuestionElement = input;
+                    input.classList.add('active-input');
+                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+
+            updateNavButtons();
+        }
+
+        function updateNavButtons() {
+            document.querySelectorAll('.subQuestion').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.subQuestion[onclick="goToQuestion(${currentQuestion})"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+            document.getElementById('prevBtn').disabled = (currentQuestion <= FIRST_Q);
+            document.getElementById('nextBtn').disabled = (currentQuestion >= LAST_Q);
+        }
+
+        function nextQuestion()     { goToQuestion(currentQuestion + 1); }
+        function previousQuestion() { goToQuestion(currentQuestion - 1); }
+
+        // ── ANSWERED INDICATORS ──
+        function isAnswered(n) {
+            if (n >= 14 && n <= 20) {
+                const dz = document.getElementById(`dz-${n}`);
+                return dz && dz.querySelector('.drag-item') !== null;
+            }
+            const input = document.getElementById(`q${n}`);
+            return input && input.value.trim() !== '';
+        }
+
+        function updateAllIndicators() {
+            for (let i = FIRST_Q; i <= LAST_Q; i++) {
+                const btn = document.querySelector(`.subQuestion[onclick="goToQuestion(${i})"]`);
+                if (!btn || btn.classList.contains('correct') || btn.classList.contains('incorrect')) continue;
+                if (isAnswered(i)) btn.classList.add('answered');
+                else btn.classList.remove('answered');
+            }
+        }
+
+        document.body.addEventListener('input',  updateAllIndicators);
+        document.body.addEventListener('change', updateAllIndicators);
+
+        // ── CHECK ANSWERS ──
+        function normalize(s) {
+            return (s || '').toString().toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function checkAnswers() {
+            // Lock inputs
+            document.querySelectorAll('input, select').forEach(el => { el.disabled = true; });
+            document.querySelectorAll('.drag-item').forEach(el => {
+                el.setAttribute('draggable', 'false');
+                el.style.cursor = 'default';
+                el.style.pointerEvents = 'none';
+            });
+            document.querySelectorAll('.passage-drop-zone').forEach(el => {
+                el.style.pointerEvents = 'none';
+            });
+
+            deliverButton.disabled = true;
+            if (timerInterval) clearInterval(timerInterval);
+            timerRunning = false;
+
+            let score = 0;
+            const resultsContainer = document.getElementById('results-details');
+            resultsContainer.innerHTML = '';
+
+            document.querySelectorAll('.correct,.incorrect,.correct-answer-highlight').forEach(el => {
+                el.classList.remove('correct','incorrect','correct-answer-highlight');
+            });
+            document.querySelectorAll('.correct-answer-display').forEach(el => el.remove());
+
+            for (let i = FIRST_Q; i <= LAST_Q; i++) {
+                const key = String(i);
+                const correct = correctAnswers[key];
+                let userAnswer = '';
+                let isCorrect  = false;
+
+                if (i >= 14 && i <= 20) {
+                    // Drag & drop
+                    const dz = document.getElementById(`dz-${i}`);
+                    const dropped = dz ? dz.querySelector('.drag-item') : null;
+                    userAnswer = dropped ? dropped.dataset.value : '';
+                    isCorrect  = (userAnswer === correct);
+
+                    if (dz) {
+                        dz.classList.add(isCorrect ? 'correct' : 'incorrect');
+                        if (!isCorrect && correct) {
+                            const hint = document.createElement('span');
+                            hint.className = 'correct-answer-display';
+                            hint.style.marginLeft = '8px';
+                            hint.textContent = ` ✓ ${correct}`;
+                            dz.appendChild(hint);
+                        }
+                    }
+                } else {
+                    // Text input (21-26)
+                    const input = document.getElementById(`q${i}`);
+                    if (input) {
+                        userAnswer = input.value.trim();
+                        const normUser = normalize(userAnswer);
+                        const normCorrect = normalize(correct);
+                        // Accept partial: allow single-word answers for two-word correct answers
+                        isCorrect = (normUser === normCorrect) ||
+                                    (Array.isArray(correct)
+                                        ? correct.some(c => normalize(c) === normUser)
+                                        : false);
+                        // Also check if normUser is included in normCorrect for multi-word
+                        if (!isCorrect && normCorrect.includes(normUser) && normUser.length > 3) {
+                            isCorrect = true;
+                        }
+                        // Exact match is always required for multi-word
+                        isCorrect = normalize(userAnswer) === normalize(correct);
+
+                        input.classList.add(isCorrect ? 'correct' : 'incorrect');
+                        if (!isCorrect) {
+                            const span = document.createElement('span');
+                            span.className = 'correct-answer-display';
+                            span.textContent = ` ✓ ${correct}`;
+                            input.insertAdjacentElement('afterend', span);
+                        }
+                    }
+                }
+
+                if (isCorrect) score++;
+
+                // Nav button
+                const navBtn = document.querySelector(`.subQuestion[onclick="goToQuestion(${i})"]`);
+                if (navBtn) {
+                    navBtn.classList.remove('answered','active');
+                    navBtn.classList.add(isCorrect ? 'correct' : 'incorrect');
+                }
+
+                // Results row
+                const row = document.createElement('div');
+                row.className = 'result-row' + (isCorrect ? '' : ' incorrect');
+                row.innerHTML = `<span class="q-num">${i}</span><span class="user-ans">${userAnswer || 'Not Answered'}</span><span class="correct-ans">${correct}</span>`;
+                resultsContainer.appendChild(row);
+            }
+
+            document.getElementById('results-score').textContent = score;
+            document.getElementById('results-band').textContent  = getBand(score);
+            deliverButton.innerHTML = '<span>View Results</span>';
+            deliverButton.disabled  = false;
+            deliverButton.onclick   = () => document.getElementById('results-modal').classList.remove('hidden');
+        }
+
+        deliverButton.addEventListener('click', checkAnswers);
+
+        // ── RESIZER ──
+        resizer.addEventListener('mousedown', e => {
+            e.preventDefault();
+            const startX = e.clientX;
+            const startW = passagePanel.offsetWidth;
+            const doDrag = e => {
+                const nw = startW + e.clientX - startX;
+                if (nw > 200 && (document.body.clientWidth - nw - resizer.offsetWidth) > 200) {
+                    passagePanel.style.flex = `0 0 ${nw}px`;
+                }
+            };
+            const stopDrag = () => {
+                window.removeEventListener('mousemove', doDrag);
+                window.removeEventListener('mouseup', stopDrag);
+            };
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+        });
+
+        // ── CONTEXT MENU ──
+        const panels = [passagePanel, questionsPanel];
+
+        document.addEventListener('selectionchange', () => {
+            const sel = window.getSelection();
+            if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+                try {
+                    const range = sel.getRangeAt(0);
+                    if (panels.some(p => p.contains(range.commonAncestorContainer))) {
+                        selectedRange = range;
+                    }
+                } catch(e) {}
+            }
+        });
+
+        panels.forEach(panel => {
+            panel.addEventListener('contextmenu', e => {
+                const target = e.target;
+                const onHighlight = target.closest('.highlight, .comment-highlight');
+                const selActive = selectedRange && selectedRange.toString().trim().length > 0;
+                let show = false;
+
+                if (onHighlight) {
+                    document.getElementById('menu-highlight').style.display = 'none';
+                    document.getElementById('menu-note').style.display = 'none';
+                    document.getElementById('menu-clear').style.display = 'flex';
+                    document.getElementById('menu-clear-all').style.display = 'flex';
+                    contextMenu._targetEl = onHighlight;
+                    show = true;
+                } else if (selActive && panels.some(p => { try { return p.contains(selectedRange.commonAncestorContainer); } catch(e) { return false; } })) {
+                    document.getElementById('menu-highlight').style.display = 'flex';
+                    document.getElementById('menu-note').style.display = 'flex';
+                    document.getElementById('menu-clear').style.display = 'none';
+                    document.getElementById('menu-clear-all').style.display = 'flex';
+                    show = true;
+                }
+
+                if (show) {
+                    e.preventDefault();
+                    contextMenu.style.display = 'block';
+                    const mh = contextMenu.offsetHeight;
+                    const mw = contextMenu.offsetWidth;
+                    let left = e.pageX, top = e.pageY - mh - 5;
+                    if (left + mw > window.innerWidth) left = window.innerWidth - mw - 5;
+                    if (top < 0) top = e.pageY + 5;
+                    contextMenu.style.left = `${left}px`;
+                    contextMenu.style.top  = `${top}px`;
+                }
+            });
+        });
+
+        document.addEventListener('click', e => {
+            if (contextMenu.style.display === 'block' && !contextMenu.contains(e.target)) {
+                closeContextMenu();
+            }
+        });
+
+        function closeContextMenu() {
+            contextMenu.style.display = 'none';
+            selectedRange = null;
+        }
+
+        function unwrapEl(el) {
+            const p = el.parentNode;
+            if (!p) return;
+            while (el.firstChild) p.insertBefore(el.firstChild, el);
+            p.removeChild(el);
+            p.normalize();
+        }
+
+        window.highlightText = () => {
+            if (selectedRange && !selectedRange.collapsed) {
+                const span = document.createElement('span');
+                span.className = 'highlight';
+                span.appendChild(selectedRange.extractContents());
+                selectedRange.insertNode(span);
+            }
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        window.openNoteModal = () => {
+            if (selectedRange && !selectedRange.collapsed) pendingNoteRange = selectedRange;
+            closeContextMenu();
+            document.getElementById('noteModal').classList.remove('hidden');
+            document.getElementById('noteText').value = '';
+            document.getElementById('noteText').focus();
+        };
+
+        window.saveNote = () => {
+            const note = document.getElementById('noteText').value.trim();
+            if (note && pendingNoteRange && !pendingNoteRange.collapsed) {
+                const span = document.createElement('span');
+                span.className = 'comment-highlight';
+                const tip = document.createElement('span');
+                tip.className = 'comment-tooltip';
+                tip.textContent = note;
+                span.appendChild(pendingNoteRange.extractContents());
+                span.appendChild(tip);
+                pendingNoteRange.insertNode(span);
+            }
+            window.cancelNote();
+        };
+
+        window.cancelNote = () => {
+            document.getElementById('noteModal').classList.add('hidden');
+            pendingNoteRange = null;
+            window.getSelection().removeAllRanges();
+        };
+
+        window.clearHighlight = () => {
+            if (contextMenu._targetEl) unwrapEl(contextMenu._targetEl);
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        window.clearAllHighlights = () => {
+            document.querySelectorAll('.highlight, .comment-highlight').forEach(unwrapEl);
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        // ── MODAL ──
+        window.closeResultsModal = () => {
+            document.getElementById('results-modal').classList.add('hidden');
+        };
+
+        // ── EXPOSE GLOBALS ──
+        window.goToQuestion     = goToQuestion;
+        window.nextQuestion     = nextQuestion;
+        window.previousQuestion = previousQuestion;
+
+        // ── INIT ──
+        goToQuestion(FIRST_Q);
+    });
+    </script>
+</body>
+</html>

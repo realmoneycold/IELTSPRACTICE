@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading — Part 1 | Set 3 | IELTSPRACTICE</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            line-height: 1.4;
+            font-size: 16px;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            background-color: #ffffff;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            height: 60px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .ielts-logo {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #1a1a2e;
+            text-decoration: none;
+            gap: 6px;
+        }
+
+        .ielts-logo-badge {
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .back-btn {
+            background: none;
+            border: 1.5px solid #ccc;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s, border-color 0.2s;
+            text-decoration: none;
+        }
+
+        .back-btn:hover { background: #f5f5f5; border-color: #999; }
+
+        .test-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .timer-container {
+            display: flex;
+            position: relative;
+            cursor: default;
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            align-items: center;
+        }
+
+        .timer-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 15px;
+        }
+
+        .timer-controls button {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            padding: 0;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .timer-controls button:hover { background: #e0e0e0; }
+        .timer-controls button svg { width: 20px; height: 20px; fill: #333; }
+
+        .timer-display.urgent { color: #dc3545; font-weight: 700; }
+
+        .header-right { display: flex; align-items: center; gap: 10px; }
+
+        .part-badge {
+            background: #1a1a2e;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── LAYOUT ── */
+        .main-container {
+            margin-top: 60px;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            height: calc(100vh - 60px);
+            position: relative;
+        }
+
+        .part-header {
+            background-color: #f1f2ec;
+            padding: 15px 20px;
+            border: 1px solid #e0e0e0;
+            text-align: left;
+            margin: 10px 20px;
+            border-radius: 5px;
+        }
+
+        .part-header p { margin: 0; }
+        .part-header p:first-child { margin-bottom: 5px; }
+
+        .panels-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .passage-panel {
+            flex: 1;
+            padding: 20px 20px 100px;
+            overflow-y: auto;
+            min-width: 200px;
+        }
+
+        .passage-panel::-webkit-scrollbar { width: 8px; background: transparent; }
+        .passage-panel::-webkit-scrollbar-track { background: transparent; }
+        .passage-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+
+        /* ── RESIZER ── */
+        .resizer {
+            position: relative;
+            background: transparent;
+            cursor: col-resize;
+            flex-shrink: 0;
+            flex-grow: 0;
+            z-index: 5;
+            width: 16px;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .resizer::before {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0; left: 50%;
+            width: 3px;
+            transform: translateX(-50%);
+            background-color: #3e3e3e;
+        }
+
+        .resizer::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 36px; height: 36px;
+            background-color: #ffffff;
+            border: 2px solid #3e3e3e;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="%233e3e3e" fill="%233e3e3e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8l-4 4 4 4"/><path d="M16 8l4 4-4 4"/><line x1="4" y1="12" x2="20" y2="12"/></svg>');
+            background-repeat: no-repeat;
+            background-size: 60% 60%;
+            background-position: center;
+            pointer-events: none;
+        }
+
+        /* ── QUESTIONS PANEL ── */
+        .questions-panel {
+            flex: 1;
+            padding: 20px 20px 100px;
+            overflow-y: auto;
+            min-width: 200px;
+            border-left: 1px solid #e0e0e0;
+        }
+
+        .questions-panel::-webkit-scrollbar { width: 8px; background: transparent; }
+        .questions-panel::-webkit-scrollbar-track { background: transparent; }
+        .questions-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 4px; }
+
+        /* ── PASSAGE TEXT ── */
+        .reading-passage h4 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .reading-passage p { margin-bottom: 1.2em; }
+
+        /* ── QUESTION ELEMENTS ── */
+        .question { margin-bottom: 40px; }
+        .question p { margin-bottom: 10px; }
+        .question-prompt { margin-bottom: 20px; }
+        .question ul { list-style: none; padding-left: 0; }
+        .question ul li { margin-bottom: 5px; }
+
+        .tf-question { margin-bottom: 20px; }
+        .tf-question-line { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+        .tf-question-number {
+            background: white;
+            border: 2px solid #ccc;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+            min-width: 30px;
+            text-align: center;
+            flex-shrink: 0;
+            transition: border-color 0.3s;
+        }
+        .tf-question.active-question .tf-question-number { border-color: #4a90e2; }
+        .tf-question-text { font-size: 16px; line-height: 1.5; }
+        .tf-options { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px; padding-left: 38px; }
+        .tf-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .tf-option:hover { background: #f1f7ff; }
+        .tf-option:has(input:checked) { background: #cfe3f9; border-color: #7db3f5; }
+        .tf-option.correct { background-color: #d4edda !important; border-color: #28a745 !important; }
+        .tf-option.incorrect { background-color: #f8d7da !important; border-color: #dc3545 !important; }
+        .tf-option.correct-answer-highlight { background-color: #d4edda !important; border-color: #28a745 !important; }
+        .tf-option input { transform: scale(1.2); accent-color: #4a90e2; }
+
+        .paragraph-matching-question { margin-bottom: 15px; }
+        .paragraph-matching-question .question-prompt p { margin-bottom: 5px; }
+
+        .answer-input {
+            border: 1px solid #bfbfbf;
+            border-radius: 4px;
+            background-color: #fff;
+            padding: 2px 8px;
+            font-size: 16px;
+            font-weight: 700;
+            margin-right: 6px;
+            margin-left: 6px;
+            height: 28px;
+            min-width: 150px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            z-index: 10;
+            position: relative;
+            pointer-events: auto;
+        }
+        .answer-input:focus, .answer-input.active-input {
+            border-color: #3581d8;
+            border-width: 2px;
+            outline: none;
+        }
+        .answer-input::placeholder { color: #666; font-weight: 700; text-align: center; }
+        .answer-input.correct { border-color: #28a745; background-color: #e9f7ef; }
+        .answer-input.incorrect { border-color: #dc3545; background-color: #f8d7da; color: #721c24; }
+
+        .correct-answer-display {
+            display: inline-block;
+            font-size: 14px;
+            color: #28a745;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+        .correct-answer-highlight {
+            background-color: #d4edda;
+            border-color: #28a745 !important;
+            color: #155724;
+        }
+
+        .multi-choice-question {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 3px solid transparent;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        .multi-choice-question.active-question { border-color: #4a90e2; }
+        .multi-choice-question .question-prompt p > strong:first-child {
+            border: 2px solid #ccc;
+            padding: 2px 8px;
+            margin-right: 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            transition: border-color 0.3s;
+            display: inline-block;
+        }
+        .multi-choice-question.active-question .question-prompt p > strong:first-child { border-color: #4a90e2; }
+        .multi-choice-option {
+            padding: 10px 12px;
+            background-color: #fff;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .multi-choice-option:hover { background-color: #f1f7ff; }
+        .multi-choice-option:has(input:checked) { background-color: #cfe3f9; border-color: #7db3f5; }
+        .multi-choice-option.correct { background-color: #d4edda !important; border-color: #28a745 !important; }
+        .multi-choice-option.incorrect { background-color: #f8d7da !important; border-color: #dc3545 !important; }
+        .multi-choice-option.correct-answer-highlight { background-color: #d4edda !important; border-color: #28a745 !important; }
+        .multi-choice-option label { display: flex; align-items: center; cursor: pointer; font-size: 16px; }
+        .multi-choice-option input[type="radio"] { margin-right: 12px; transform: scale(1.3); accent-color: #4a90e2; }
+
+        /* ── NAVIGATION ARROWS ── */
+        .nav-arrows {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            display: flex;
+            gap: 6px;
+            z-index: 101;
+        }
+
+        .nav-arrow {
+            width: 48px; height: 48px;
+            border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 700; color: #fff;
+            transition: transform 0.1s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+            outline: none;
+        }
+        .nav-arrow.prev { background-color: #4b5563; }
+        .nav-arrow.next { background-color: #000000; }
+        .nav-arrow:hover { transform: translateY(-1px); }
+        .nav-arrow:active { transform: translateY(0); }
+        .nav-arrow:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── BOTTOM NAV ── */
+        .nav-row {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #ffffff;
+            border-top: 1px solid #e0e0e0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            height: 80px;
+            z-index: 100;
+            padding-left: 20px;
+            gap: 4px;
+            overflow-x: auto;
+        }
+
+        .subQuestion {
+            width: 32px; height: 32px;
+            border: 1px solid #ccc;
+            background: white;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        .subQuestion.answered { background-color: #e9ecef; border-color: #ddd; }
+        .subQuestion.correct { background-color: #28a745; color: white; border-color: #28a745; }
+        .subQuestion.incorrect { background-color: #dc3545; color: white; border-color: #dc3545; }
+        .subQuestion:hover { background-color: #f0f0f0; border-color: #999; }
+        .subQuestion.active { background-color: #4a90e2; color: white; border-color: #4a90e2; }
+
+        .sr-only {
+            position: absolute; width: 1px; height: 1px; padding: 0;
+            margin: -1px; overflow: hidden; clip: rect(0,0,0,0);
+            white-space: nowrap; border: 0;
+        }
+
+        .footer__deliverButton___3FM07 {
+            margin-left: auto;
+            margin-right: 20px;
+            flex-shrink: 0;
+            background-color: #f3f4f6;
+            color: #111827;
+            border: 1px solid #d1d5db;
+            padding: 10px 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.08s ease, background-color 0.2s ease, border-color 0.2s ease;
+            min-width: 160px;
+            justify-content: center;
+        }
+        .footer__deliverButton___3FM07:hover { background-color: #ebedf0; border-color: #c7ccd4; }
+        .footer__deliverButton___3FM07:active { transform: translateY(1px); }
+        .footer__deliverButton___3FM07:disabled {
+            background: #eef0f3; color: #9ca3af;
+            cursor: not-allowed; border-color: #e5e7eb;
+        }
+
+        /* ── CONTEXT MENU ── */
+        .context-menu {
+            position: fixed;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: none;
+            min-width: 140px;
+        }
+        .context-menu-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .context-menu-item:hover { background-color: #f8f9fa; }
+        .context-menu-item:last-child { border-bottom: none; }
+
+        .highlight { background-color: #ffff00; }
+        .comment-highlight {
+            background-color: #90EE90;
+            position: relative;
+            cursor: help;
+        }
+        .comment-tooltip {
+            position: absolute;
+            bottom: 100%; left: 50%;
+            transform: translateX(-50%);
+            background: #333; color: white;
+            padding: 8px 12px;
+            border-radius: 4px; font-size: 14px;
+            white-space: nowrap; z-index: 1000;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .comment-highlight:hover .comment-tooltip { opacity: 1; }
+
+        /* ── RESULTS MODAL ── */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(17,24,39,0.6);
+            backdrop-filter: blur(3px);
+            z-index: 2000;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .modal-overlay.hidden { display: none; }
+        .modal-content {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 14px;
+            width: 92%; max-width: 780px; max-height: 86vh;
+            display: flex; flex-direction: column;
+            position: relative;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+        .modal-close-btn {
+            position: absolute; top: 10px; right: 15px;
+            background: none; border: none;
+            font-size: 28px; cursor: pointer; color: #666;
+        }
+        .modal-content h2 { text-align: center; margin-bottom: 18px; color: #111827; font-size: 22px; }
+        .results-summary { text-align: center; margin-bottom: 18px; font-size: 16px; }
+        .results-summary p { margin-bottom: 8px; }
+        .results-summary span { font-weight: 700; font-size: 18px; color: #1a1a2e; }
+        .results-details-container { overflow-y: auto; flex: 1; border-top: 1px solid #e5e7eb; }
+        .results-details-header, .result-row {
+            display: grid;
+            grid-template-columns: 60px 1fr 1fr;
+            gap: 10px; padding: 10px 15px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+            align-items: center;
+        }
+        .results-details-header { font-weight: 700; background: #f9fafb; position: sticky; top: 0; }
+        .result-row.incorrect { background-color: #fff5f5; }
+        .result-row .q-num { font-weight: 700; color: #374151; }
+        .result-row .user-ans { color: #6b7280; }
+        .result-row .correct-ans { color: #059669; font-weight: 600; }
+
+        .hidden { display: none !important; }
+
+        /* ── NOTE MODAL ── */
+        .note-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 3000;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .note-modal-overlay.hidden { display: none; }
+        .note-modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 380px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .note-modal-content h3 { margin-bottom: 12px; font-size: 16px; }
+        .note-modal-content textarea {
+            width: 100%; height: 100px;
+            border: 1px solid #ccc; border-radius: 4px;
+            padding: 8px; font-size: 14px; resize: vertical;
+        }
+        .note-modal-buttons { display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; }
+        .note-modal-buttons button {
+            padding: 8px 16px; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 600; font-size: 14px;
+        }
+        .note-btn-save { background: #4a90e2; color: white; }
+        .note-btn-cancel { background: #f3f4f6; color: #333; }
+
+        @media (max-width: 768px) {
+            .resizer::after { width: 44px; height: 44px; }
+        }
+        @media (max-width: 480px) {
+            .passage-panel, .questions-panel { width: 100%; min-width: auto; }
+            .resizer { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ── HEADER ── -->
+    <div class="header">
+        <div class="header-left">
+            <a class="ielts-logo" href="#">
+                <span class="ielts-logo-badge">IELTS</span>PRACTICE
+            </a>
+            <span class="part-badge">Reading — Part 1 | Set 3</span>
+        </div>
+        <div class="test-info">
+            <div class="timer-container">
+                <span class="timer-display">20:00</span>
+                <div class="timer-controls">
+                    <button id="timer-toggle-btn" title="Pause/Resume Timer">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M8 5v14l11-7L8 5z"/>
+                        </svg>
+                    </button>
+                    <button id="timer-reset-btn" title="Reset Timer">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px">
+                            <path d="M0 0h24v24H0V0z" fill="none"/>
+                            <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── MAIN ── -->
+    <div class="main-container" id="main-container">
+        <div class="part-header">
+            <p><strong>Part 1</strong></p>
+            <p>Read the text and answer questions 1–13.</p>
+        </div>
+        <div class="panels-container">
+            <!-- PASSAGE -->
+            <div class="passage-panel" id="passage-panel">
+                <div class="reading-passage">
+                    <h4 class="text-center">SOSUS: Listening to the Ocean</h4>
+                    <p><strong>A</strong>&nbsp;&nbsp;The oceans of Earth cover more than 70 percent of the planet's surface, yet, until quite recently, we knew less about their depths than we did about the surface of the Moon. Distant as it is, the Moon has been far more accessible to study because astronomers long have been able to look at its surface, first with the naked eye and then with the telescope—both instruments that focus light. And, with telescopes tuned to different wavelengths of light, modern astronomers can not only analyze Earth's atmosphere but also determine the temperature and composition of the Sun or other stars many hundreds of light-years away. Until the twentieth century, however, no analogous instruments were available for the study of Earth's oceans: Light, which can travel trillions of miles through the vast vacuum of space, cannot penetrate very far in seawater.</p>
+                    <p><strong>B</strong>&nbsp;&nbsp;Curious investigators long have been fascinated by sound and the way it travels in water. As early as 1490, Leonardo da Vinci observed: "If you cause your ship to stop and place the head of a long tube in the water and place the outer extremity to your ear, you will hear ships at a great distance from you." In 1687, the first mathematical theory of sound propagation was published by Sir Isaac Newton in his <em>Philosophiae Naturalis Principia Mathematica</em>. Investigators were measuring the speed of sound in the air beginning in the mid-seventeenth century, but it was not until 1826 that Daniel Colladon, a Swiss physicist, and Charles Sturm, a French mathematician, accurately measured its speed in the water. Using a long tube to listen underwater (as da Vinci had suggested), they recorded how fast the sound of a submerged bell traveled across Lake Geneva. Their result—1,435 meters (1,569 yards) per second in the water of 1.8 degrees Celsius (35 degrees Fahrenheit)—was only 3 meters per second off from the speed accepted today. What these investigators demonstrated was that water—whether fresh or salt—is an excellent medium for sound, transmitting it almost five times faster than its speed in air.</p>
+                    <p><strong>C</strong>&nbsp;&nbsp;In 1877 and 1878, the British scientist John William Strutt, third Baron Rayleigh, published his two-volume seminal work, <em>The Theory of Sound</em>, often regarded as marking the beginning of the modern study of acoustics. The recipient of the Nobel Prize for Physics in 1904 for his successful isolation of the element argon, Lord Rayleigh made key discoveries in the fields of acoustics and optics that are critical to the theory of wave propagation in fluids. Among other things, Lord Rayleigh was the first to describe a sound wave as a mathematical equation (the basis of all theoretical work on acoustics) and the first to describe how small particles in the atmosphere scatter certain wavelengths of sunlight, a principle that also applies to the behavior of sound waves in water.</p>
+                    <p><strong>D</strong>&nbsp;&nbsp;A number of factors influence how far sound travels underwater and how long it lasts. For one, particles in seawater can reflect, scatter, and absorb certain frequencies of sound—just as certain wavelengths of light may be reflected, scattered, and absorbed by specific types of particles in the atmosphere. Seawater absorbs 30 times the amount of sound absorbed by distilled water, with specific chemicals (such as magnesium sulfate and boric acid) damping out certain frequencies of sound. Researchers also learned that low-frequency sounds, whose long wavelengths generally pass over tiny particles, tend to travel farther without loss through absorption or scattering. Further work on the effects of salinity, temperature, and pressure on the speed of sound has yielded fascinating insights into the structure of the ocean. Speaking generally, the ocean is divided into horizontal layers in which sound speed is influenced more greatly by temperature in the upper regions and by pressure in the lower depths. At the surface is a sun-warmed upper layer, the actual temperature and thickness of which varies with the season. At mid-latitudes, this layer tends to be isothermal; a sound signal moving down through this layer tends to travel at an almost constant speed. Next comes a transitional layer called the thermocline, in which temperature drops steadily with depth; as the temperature falls, so does the speed of sound.</p>
+                    <p><strong>E</strong>&nbsp;&nbsp;The U.S. Navy was quick to appreciate the usefulness of low-frequency sound and the deep sound channel in extending the range at which it could detect submarines. In great secrecy during the 1950s, the U.S. Navy launched a project that went by the code name Jezebel; it would later come to be known as the Sound Surveillance System (SOSUS). The system involved arrays of underwater microphones, called hydrophones, that were placed on the ocean bottom and connected by cables to onshore processing centers. With SOSUS deployed in both deep and shallow water along both coasts of North America and the British West Indies, the U.S. Navy not only could detect submarines in much of the northern hemisphere, it also could distinguish how many propellers a submarine had, whether it was conventional or nuclear, and sometimes even the class of sub.</p>
+                    <p><strong>F</strong>&nbsp;&nbsp;The realization that SOSUS could be used to listen to whales also was made by Christopher Clark, a biological acoustician at Cornell University, when he first visited a SOSUS station in 1992. When Clark looked at the graphic representations of sound, scrolling 24 hours a day, every day, he saw the voice patterns of blue, finback, minke, and humpback whales. He also could hear the sounds. Using a SOSUS receiver in the West Indies, he could hear whales that were 1,770 kilometers (1,100 miles) away. Using the SOSUS stations, scientists can track the whales in real-time and position them on a map. Moreover, they can track not just one whale at a time, but many creatures simultaneously throughout the North Atlantic and the eastern North Pacific. They also can learn to distinguish whale calls. For example, Fox and colleagues have detected changes in the calls of finback whales during different seasons and have found that blue whales in different regions of the Pacific Ocean have different calls.</p>
+                    <p><strong>G</strong>&nbsp;&nbsp;SOSUS, with its vast reach, also has proved instrumental in obtaining information crucial to our understanding of Earth's weather and climate. Specifically, the system has enabled researchers to begin making ocean temperature measurements on a global scale—measurements that are keys to puzzling out the workings of heat transfer between the ocean and the atmosphere. The ocean plays an enormous role in determining air temperature—the heat capacity in only the upper few meters of the ocean is thought to be equal to all of the heat in the entire atmosphere. For sound waves traveling horizontally in the ocean, speed is largely a function of temperature. Thus, the travel time of a wave of sound between two points is a sensitive indicator of the average temperature along its path. Transmitting sound in numerous directions through the deep sound channel can give scientists measurements spanning vast areas of the globe. Thousands of sound paths in the ocean could be pieced together into a map of global ocean temperatures and, by repeating measurements along the same paths over time, scientists could track changes in temperature over months or years.</p>
+                    <p><strong>H</strong>&nbsp;&nbsp;Researchers also are using other acoustic techniques to monitor climate. Oceanographer Jeff Nystuen at the University of Washington, for example, has explored the use of sound to measure rainfall over the ocean. Monitoring changing global rainfall patterns undoubtedly will contribute to understanding major climate change as well as the weather phenomenon known as El Niño. Since 1985, Nystuen has used hydrophones to listen to rain over the ocean, acoustically measuring not only the rainfall rate but also the rainfall type, from drizzle to thunderstorms. By using the sound of rain underwater as a "natural" rain gauge, the measurement of rainfall over the oceans will become available to climatologists.</p>
+                </div>
+            </div>
+
+            <!-- RESIZER -->
+            <div class="resizer" id="resizer"></div>
+
+            <!-- QUESTIONS -->
+            <div class="questions-panel" id="questions-panel">
+                <div class="questions-container">
+                    <!-- WHAT IF I YOU FLY? -->
+
+                    <!-- Q 1–4: True/False/Not Given -->
+                    <div class="question" data-q-start="1" data-q-end="4">
+                        <div class="question-prompt">
+                            <p><strong>Questions 1–4</strong></p>
+                            <p>Do the following statements agree with the information given in the text?</p>
+                            <p><strong>TRUE</strong> if the statement is true</p>
+                            <p><strong>FALSE</strong> if the statement is false</p>
+                            <p><strong>NOT GIVEN</strong> if the information is not given in the passage</p>
+                        </div>
+                        <div class="tf-question" data-q-start="1" data-q-end="1">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">1</span>
+                                <span class="tf-question-text">In the past, difficulties of research carried out on Moon were much easier than that of the ocean.</span>
+                            </div>
+                            <div class="tf-options">
+                                <label class="tf-option"><input type="radio" name="q1" value="TRUE"> TRUE</label>
+                                <label class="tf-option"><input type="radio" name="q1" value="FALSE"> FALSE</label>
+                                <label class="tf-option"><input type="radio" name="q1" value="NOT GIVEN"> NOT GIVEN</label>
+                            </div>
+                        </div>
+                        <div class="tf-question" data-q-start="2" data-q-end="2">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">2</span>
+                                <span class="tf-question-text">The same light technology used in the investigation of the moon can be employed in the field of the ocean.</span>
+                            </div>
+                            <div class="tf-options">
+                                <label class="tf-option"><input type="radio" name="q2" value="TRUE"> TRUE</label>
+                                <label class="tf-option"><input type="radio" name="q2" value="FALSE"> FALSE</label>
+                                <label class="tf-option"><input type="radio" name="q2" value="NOT GIVEN"> NOT GIVEN</label>
+                            </div>
+                        </div>
+                        <div class="tf-question" data-q-start="3" data-q-end="3">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">3</span>
+                                <span class="tf-question-text">Research on the depth of the ocean by the method of the sound wave is more time-consuming.</span>
+                            </div>
+                            <div class="tf-options">
+                                <label class="tf-option"><input type="radio" name="q3" value="TRUE"> TRUE</label>
+                                <label class="tf-option"><input type="radio" name="q3" value="FALSE"> FALSE</label>
+                                <label class="tf-option"><input type="radio" name="q3" value="NOT GIVEN"> NOT GIVEN</label>
+                            </div>
+                        </div>
+                        <div class="tf-question" data-q-start="4" data-q-end="4">
+                            <div class="tf-question-line">
+                                <span class="tf-question-number">4</span>
+                                <span class="tf-question-text">Hydrophones technology is able to detect the category of precipitation.</span>
+                            </div>
+                            <div class="tf-options">
+                                <label class="tf-option"><input type="radio" name="q4" value="TRUE"> TRUE</label>
+                                <label class="tf-option"><input type="radio" name="q4" value="FALSE"> FALSE</label>
+                                <label class="tf-option"><input type="radio" name="q4" value="NOT GIVEN"> NOT GIVEN</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Q 5–8: Paragraph Matching -->
+                    <div class="question" data-q-start="5" data-q-end="8">
+                        <div class="question-prompt">
+                            <p><strong>Questions 5–8</strong></p>
+                            <p>The text has eight paragraphs <strong>A–H</strong>. Which paragraph contains the following information?</p>
+                            <p><i><strong>NB</strong> You may use any letter more than once.</i></p>
+                        </div>
+                        <div class="paragraph-matching-question">
+                            <div class="question-prompt"><p><strong>5.</strong> Elements that affect sound transmission in the ocean.</p></div>
+                            <select class="answer-input" id="q5" autocomplete="off">
+                                <option value="">Select answer</option>
+                                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                                <option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                                <option value="G">G</option><option value="H">H</option>
+                            </select>
+                        </div>
+                        <div class="paragraph-matching-question">
+                            <div class="question-prompt"><p><strong>6.</strong> Relationship between global climate and ocean temperature.</p></div>
+                            <select class="answer-input" id="q6" autocomplete="off">
+                                <option value="">Select answer</option>
+                                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                                <option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                                <option value="G">G</option><option value="H">H</option>
+                            </select>
+                        </div>
+                        <div class="paragraph-matching-question">
+                            <div class="question-prompt"><p><strong>7.</strong> Examples of how sound technology helps people research ocean creatures.</p></div>
+                            <select class="answer-input" id="q7" autocomplete="off">
+                                <option value="">Select answer</option>
+                                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                                <option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                                <option value="G">G</option><option value="H">H</option>
+                            </select>
+                        </div>
+                        <div class="paragraph-matching-question">
+                            <div class="question-prompt"><p><strong>8.</strong> Sound transmission underwater is similar to that of light in any condition.</p></div>
+                            <select class="answer-input" id="q8" autocomplete="off">
+                                <option value="">Select answer</option>
+                                <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+                                <option value="D">D</option><option value="E">E</option><option value="F">F</option>
+                                <option value="G">G</option><option value="H">H</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Q 9–13: Multiple Choice -->
+                    <div class="question" data-q-start="9" data-q-end="13">
+                        <div class="question-prompt">
+                            <p><strong>Questions 9–13</strong></p>
+                            <p>Choose the correct answer.</p>
+                        </div>
+                        <div class="multi-choice-question" data-q-start="9" data-q-end="9">
+                            <div class="question-prompt"><p><strong>9.</strong> Who of the following is dedicated to the research of the rate of sound?</p></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q9" value="A"> Leonardo da Vinci</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q9" value="B"> Isaac Newton</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q9" value="C"> John William Strutt</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q9" value="D"> Charles Sturm</label></div>
+                        </div>
+                        <div class="multi-choice-question" data-q-start="10" data-q-end="10">
+                            <div class="question-prompt"><p><strong>10.</strong> Who explained that the theory of light or sound wavelength is significant in the water?</p></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q10" value="A"> Lord Rayleigh</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q10" value="B"> John William Strutt</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q10" value="C"> Charles Sturm</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q10" value="D"> Christopher Clark</label></div>
+                        </div>
+                        <div class="multi-choice-question" data-q-start="11" data-q-end="11">
+                            <div class="question-prompt"><p><strong>11.</strong> According to Fox and colleagues, in what pattern does the change of finback whale calls happen?</p></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q11" value="A"> Change in various seasons</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q11" value="B"> Change in various days</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q11" value="C"> Change in different months</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q11" value="D"> Change in different years</label></div>
+                        </div>
+                        <div class="multi-choice-question" data-q-start="12" data-q-end="12">
+                            <div class="question-prompt"><p><strong>12.</strong> In which way does the SOSUS technology inspect whales?</p></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q12" value="A"> Track all kinds of whales in the ocean</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q12" value="B"> Track bunches of whales at the same time</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q12" value="C"> Track only finback whales in the ocean</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q12" value="D"> Track whales by using multiple appliances or devices</label></div>
+                        </div>
+                        <div class="multi-choice-question" data-q-start="13" data-q-end="13">
+                            <div class="question-prompt"><p><strong>13.</strong> What could scientists inspect via monitoring along a repeated route?</p></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q13" value="A"> Temperature of the surface passed</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q13" value="B"> Temperature of the deepest ocean floor</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q13" value="C"> Variation of temperature</label></div>
+                            <div class="multi-choice-option"><label><input type="radio" name="q13" value="D"> Fixed data of temperature</label></div>
+                        </div>
+                    </div>
+
+                </div><!-- /questions-container -->
+            </div><!-- /questions-panel -->
+        </div><!-- /panels-container -->
+    </div><!-- /main-container -->
+
+    <!-- Navigation Arrows -->
+    <div class="nav-arrows">
+        <button class="nav-arrow prev" onclick="previousQuestion()" id="prevBtn" aria-label="Previous question">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+        <button class="nav-arrow next" onclick="nextQuestion()" id="nextBtn" aria-label="Next question">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="nav-row" aria-label="Questions">
+        <button class="subQuestion scorable-item" onclick="goToQuestion(1)"><span class="sr-only">Question 1</span><span aria-hidden="true">1</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(2)"><span class="sr-only">Question 2</span><span aria-hidden="true">2</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(3)"><span class="sr-only">Question 3</span><span aria-hidden="true">3</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(4)"><span class="sr-only">Question 4</span><span aria-hidden="true">4</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(5)"><span class="sr-only">Question 5</span><span aria-hidden="true">5</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(6)"><span class="sr-only">Question 6</span><span aria-hidden="true">6</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(7)"><span class="sr-only">Question 7</span><span aria-hidden="true">7</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(8)"><span class="sr-only">Question 8</span><span aria-hidden="true">8</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(9)"><span class="sr-only">Question 9</span><span aria-hidden="true">9</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(10)"><span class="sr-only">Question 10</span><span aria-hidden="true">10</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(11)"><span class="sr-only">Question 11</span><span aria-hidden="true">11</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(12)"><span class="sr-only">Question 12</span><span aria-hidden="true">12</span></button>
+        <button class="subQuestion scorable-item" onclick="goToQuestion(13)"><span class="sr-only">Question 13</span><span aria-hidden="true">13</span></button>
+        <button id="deliver-button" class="footer__deliverButton___3FM07" aria-label="Check your answers">
+            <span>Check Answers</span>
+        </button>
+    </nav>
+
+    <!-- Context Menu -->
+    <div id="contextMenu" class="context-menu">
+        <div id="menu-highlight" class="context-menu-item" onclick="highlightText()">✏️ Highlight</div>
+        <div id="menu-note" class="context-menu-item" onclick="openNoteModal()">📝 Note</div>
+        <div id="menu-clear" class="context-menu-item" onclick="clearHighlight()">🗑️ Clear</div>
+        <div id="menu-clear-all" class="context-menu-item" onclick="clearAllHighlights()">🗑️ Clear All</div>
+    </div>
+
+    <!-- Note Modal -->
+    <div id="noteModal" class="note-modal-overlay hidden">
+        <div class="note-modal-content">
+            <h3>Add Note</h3>
+            <textarea id="noteText" placeholder="Enter your note here..."></textarea>
+            <div class="note-modal-buttons">
+                <button class="note-btn-cancel" onclick="cancelNote()">Cancel</button>
+                <button class="note-btn-save" onclick="saveNote()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="results-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-btn" onclick="closeResultsModal()">&times;</button>
+            <h2>Results — Part 1 | Set 2</h2>
+            <div class="results-summary">
+                <p>Score: <span id="results-score"></span> / 13</p>
+                <p>IELTS Band: <span id="results-band"></span></p>
+            </div>
+            <div class="results-details-header">
+                <span>Q#</span><span>Your Answer</span><span>Correct Answer</span>
+            </div>
+            <div id="results-details" class="results-details-container"></div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // ── STATE ──
+        const FIRST_Q = 1;
+        const LAST_Q  = 13;
+        let currentQuestion = FIRST_Q;
+        let selectedRange   = null;
+        let activeQuestionElement = null;
+        let pendingNoteRange = null;
+
+        // Timer: 20 minutes for a single part
+        let timeInSeconds = 1200;
+        let timerInterval = null;
+        let timerRunning  = false;
+
+        // ── ANSWERS ──
+        const correctAnswers = {
+            '1':  'TRUE',
+            '2':  'FALSE',
+            '3':  'NOT GIVEN',
+            '4':  'TRUE',
+            '5':  'D',
+            '6':  'G',
+            '7':  'F',
+            '8':  'D',
+            '9':  'D',
+            '10': 'A',
+            '11': 'A',
+            '12': 'B',
+            '13': 'C'
+        };
+
+        // Band score mapping (out of 13)
+        function getBand(score) {
+            if (score >= 13) return '9.0';
+            if (score >= 12) return '8.5';
+            if (score >= 11) return '8.0';
+            if (score >= 10) return '7.5';
+            if (score >= 9)  return '7.0';
+            if (score >= 8)  return '6.5';
+            if (score >= 7)  return '6.0';
+            if (score >= 6)  return '5.5';
+            if (score >= 5)  return '5.0';
+            if (score >= 4)  return '4.5';
+            if (score >= 3)  return '4.0';
+            return '3.5';
+        }
+
+        // ── DOM REFS ──
+        const timerDisplay     = document.querySelector('.timer-display');
+        const timerToggleBtn   = document.getElementById('timer-toggle-btn');
+        const timerResetBtn    = document.getElementById('timer-reset-btn');
+        const deliverButton    = document.getElementById('deliver-button');
+        const resizer          = document.getElementById('resizer');
+        const passagePanel     = document.getElementById('passage-panel');
+        const questionsPanel   = document.getElementById('questions-panel');
+        const contextMenu      = document.getElementById('contextMenu');
+
+        const playIcon  = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M8 5v14l11-7L8 5z"/></svg>';
+        const pauseIcon = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+
+        // ── TIMER ──
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerRunning = true;
+            timerInterval = setInterval(() => {
+                timeInSeconds--;
+                const m = Math.floor(timeInSeconds / 60);
+                const s = timeInSeconds % 60;
+                timerDisplay.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                if (timeInSeconds <= 300) timerDisplay.classList.add('urgent');
+                if (timeInSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.textContent = "Time's up!";
+                }
+            }, 1000);
+            timerToggleBtn.innerHTML = pauseIcon;
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            timerToggleBtn.innerHTML = playIcon;
+        }
+
+        function toggleTimer() {
+            if (timerRunning) pauseTimer(); else startTimer();
+        }
+
+        function resetTimer() {
+            timeInSeconds = 1200;
+            timerDisplay.classList.remove('urgent');
+            timerDisplay.textContent = '20:00';
+            startTimer();
+        }
+
+        timerToggleBtn.addEventListener('click', toggleTimer);
+        timerResetBtn.addEventListener('click', resetTimer);
+        startTimer();
+
+        // ── NAVIGATION ──
+        function goToQuestion(n) {
+            if (n < FIRST_Q || n > LAST_Q) return;
+            currentQuestion = n;
+
+            // Clear previous active state
+            if (activeQuestionElement) {
+                activeQuestionElement.classList.remove('active-question', 'active-input');
+                const prevBlock = activeQuestionElement.closest('[data-q-start]');
+                if (prevBlock) prevBlock.classList.remove('active-question');
+            }
+
+            // Try to find specific input first
+            let targetEl = document.getElementById(`q${n}`);
+            if (targetEl) {
+                activeQuestionElement = targetEl;
+                targetEl.classList.add('active-input');
+                scrollIfNeeded(targetEl, questionsPanel);
+            } else {
+                targetEl = document.querySelector(`.tf-question[data-q-start="${n}"], .multi-choice-question[data-q-start="${n}"]`);
+                if (targetEl) {
+                    activeQuestionElement = targetEl;
+                    targetEl.classList.add('active-question');
+                    scrollIfNeeded(targetEl, questionsPanel);
+                }
+            }
+
+            updateNavButtons();
+        }
+
+        function updateNavButtons() {
+            document.querySelectorAll('.subQuestion').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.subQuestion[onclick="goToQuestion(${currentQuestion})"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            document.getElementById('prevBtn').disabled = (currentQuestion <= FIRST_Q);
+            document.getElementById('nextBtn').disabled = (currentQuestion >= LAST_Q);
+        }
+
+        function nextQuestion() { goToQuestion(currentQuestion + 1); }
+        function previousQuestion() { goToQuestion(currentQuestion - 1); }
+
+        function scrollIfNeeded(el, container) {
+            const elRect = el.getBoundingClientRect();
+            const cRect  = container.getBoundingClientRect();
+            if (elRect.top < cRect.top || elRect.bottom > cRect.bottom) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        // ── ANSWERED INDICATORS ──
+        function isAnswered(n) {
+            const input = document.getElementById(`q${n}`);
+            if (input) {
+                if (input.tagName === 'SELECT') return input.value !== '';
+                return input.value.trim() !== '';
+            }
+            return !!document.querySelector(`input[name="q${n}"]:checked`);
+        }
+
+        function updateAllIndicators() {
+            for (let i = FIRST_Q; i <= LAST_Q; i++) {
+                const btn = document.querySelector(`.subQuestion[onclick="goToQuestion(${i})"]`);
+                if (!btn) continue;
+                if (btn.classList.contains('correct') || btn.classList.contains('incorrect')) continue;
+                if (isAnswered(i)) btn.classList.add('answered');
+                else btn.classList.remove('answered');
+            }
+        }
+
+        document.body.addEventListener('input',  updateAllIndicators);
+        document.body.addEventListener('change', updateAllIndicators);
+
+        // ── CHECK ANSWERS ──
+        function checkAnswers() {
+            // Lock all inputs
+            document.querySelectorAll('input, select').forEach(el => {
+                el.disabled = true;
+                if (el.type === 'radio') {
+                    el.style.cursor = 'not-allowed';
+                    if (el.parentElement) el.parentElement.style.cursor = 'not-allowed';
+                }
+            });
+
+            deliverButton.disabled = true;
+            if (timerInterval) clearInterval(timerInterval);
+            timerRunning = false;
+
+            let score = 0;
+            const resultsContainer = document.getElementById('results-details');
+            resultsContainer.innerHTML = '';
+
+            // Clear previous result styles
+            document.querySelectorAll('.correct,.incorrect,.correct-answer-highlight').forEach(el => {
+                el.classList.remove('correct','incorrect','correct-answer-highlight');
+            });
+            document.querySelectorAll('.correct-answer-display').forEach(el => el.remove());
+
+            for (let i = FIRST_Q; i <= LAST_Q; i++) {
+                const key = String(i);
+                const correct = correctAnswers[key];
+                let userAnswer = '';
+                let isCorrect  = false;
+
+                const normalize = s => (s||'').toString().toLowerCase().replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();
+
+                const textInput  = document.getElementById(`q${i}`);
+                const radioInput = document.querySelector(`input[name="q${i}"]:checked`);
+
+                if (textInput && textInput.tagName === 'SELECT') {
+                    userAnswer = textInput.value;
+                    isCorrect = (userAnswer === correct);
+                    textInput.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    if (!isCorrect) {
+                        const span = document.createElement('span');
+                        span.className = 'correct-answer-display';
+                        span.textContent = ` ✓ ${correct}`;
+                        textInput.insertAdjacentElement('afterend', span);
+                    }
+                } else if (radioInput) {
+                    userAnswer = radioInput.value;
+                    isCorrect = (userAnswer === correct);
+                    const lbl = radioInput.closest('.tf-option, .multi-choice-option');
+                    if (lbl) lbl.classList.add(isCorrect ? 'correct' : 'incorrect');
+                    if (!isCorrect) {
+                        const correctInput = document.querySelector(`input[name="q${i}"][value="${correct}"]`);
+                        if (correctInput) {
+                            const correctLbl = correctInput.closest('.tf-option, .multi-choice-option');
+                            if (correctLbl) correctLbl.classList.add('correct-answer-highlight');
+                        }
+                    }
+                }
+
+                if (isCorrect) score++;
+
+                // Nav button colouring
+                const navBtn = document.querySelector(`.subQuestion[onclick="goToQuestion(${i})"]`);
+                if (navBtn) {
+                    navBtn.classList.remove('answered','active');
+                    navBtn.classList.add(isCorrect ? 'correct' : 'incorrect');
+                }
+
+                // Add to results modal
+                const row = document.createElement('div');
+                row.className = 'result-row' + (isCorrect ? '' : ' incorrect');
+                row.innerHTML = `<span class="q-num">${i}</span><span class="user-ans">${userAnswer || 'Not Answered'}</span><span class="correct-ans">${correct}</span>`;
+                resultsContainer.appendChild(row);
+            }
+
+            document.getElementById('results-score').textContent = score;
+            document.getElementById('results-band').textContent  = getBand(score);
+            deliverButton.innerHTML = '<span>View Results</span>';
+            deliverButton.disabled  = false;
+            deliverButton.onclick   = () => document.getElementById('results-modal').classList.remove('hidden');
+        }
+
+        deliverButton.addEventListener('click', checkAnswers);
+
+        // ── RESIZER ──
+        resizer.addEventListener('mousedown', e => {
+            e.preventDefault();
+            const startX = e.clientX;
+            const startW = passagePanel.offsetWidth;
+            const doDrag = e => {
+                const nw = startW + e.clientX - startX;
+                if (nw > 200 && (document.body.clientWidth - nw - resizer.offsetWidth) > 200) {
+                    passagePanel.style.flex = `0 0 ${nw}px`;
+                }
+            };
+            const stopDrag = () => {
+                window.removeEventListener('mousemove', doDrag);
+                window.removeEventListener('mouseup', stopDrag);
+            };
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('mouseup', stopDrag);
+        });
+
+        // ── CONTEXT MENU ──
+        const panels = [passagePanel, questionsPanel];
+
+        document.addEventListener('selectionchange', () => {
+            const sel = window.getSelection();
+            if (sel && !sel.isCollapsed && sel.toString().trim().length > 0) {
+                const range = sel.getRangeAt(0);
+                if (panels.some(p => p.contains(range.commonAncestorContainer))) {
+                    selectedRange = range;
+                }
+            }
+        });
+
+        panels.forEach(panel => {
+            panel.addEventListener('contextmenu', e => {
+                const target = e.target;
+                const onHighlight = target.closest('.highlight, .comment-highlight');
+                const selActive = selectedRange && selectedRange.toString().trim().length > 0;
+                let show = false;
+
+                if (onHighlight) {
+                    document.getElementById('menu-highlight').style.display = 'none';
+                    document.getElementById('menu-note').style.display = 'none';
+                    document.getElementById('menu-clear').style.display = 'flex';
+                    document.getElementById('menu-clear-all').style.display = 'flex';
+                    contextMenu._targetEl = onHighlight;
+                    show = true;
+                } else if (selActive && panels.some(p => p.contains(selectedRange.commonAncestorContainer))) {
+                    document.getElementById('menu-highlight').style.display = 'flex';
+                    document.getElementById('menu-note').style.display = 'flex';
+                    document.getElementById('menu-clear').style.display = 'none';
+                    document.getElementById('menu-clear-all').style.display = 'flex';
+                    show = true;
+                }
+
+                if (show) {
+                    e.preventDefault();
+                    contextMenu.style.display = 'block';
+                    const mh = contextMenu.offsetHeight;
+                    const mw = contextMenu.offsetWidth;
+                    let left = e.pageX, top = e.pageY - mh - 5;
+                    if (left + mw > window.innerWidth) left = window.innerWidth - mw - 5;
+                    if (top < 0) top = e.pageY + 5;
+                    contextMenu.style.left = `${left}px`;
+                    contextMenu.style.top  = `${top}px`;
+                }
+            });
+        });
+
+        document.addEventListener('click', e => {
+            if (contextMenu.style.display === 'block' && !contextMenu.contains(e.target)) {
+                closeContextMenu();
+            }
+        });
+
+        function closeContextMenu() {
+            contextMenu.style.display = 'none';
+            selectedRange = null;
+        }
+
+        function unwrapEl(el) {
+            const p = el.parentNode;
+            if (!p) return;
+            while (el.firstChild) p.insertBefore(el.firstChild, el);
+            p.removeChild(el);
+            p.normalize();
+        }
+
+        window.highlightText = () => {
+            if (selectedRange && !selectedRange.collapsed) {
+                const span = document.createElement('span');
+                span.className = 'highlight';
+                span.appendChild(selectedRange.extractContents());
+                selectedRange.insertNode(span);
+            }
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        window.openNoteModal = () => {
+            if (selectedRange && !selectedRange.collapsed) {
+                pendingNoteRange = selectedRange;
+            }
+            closeContextMenu();
+            document.getElementById('noteModal').classList.remove('hidden');
+            document.getElementById('noteText').value = '';
+            document.getElementById('noteText').focus();
+        };
+
+        window.saveNote = () => {
+            const note = document.getElementById('noteText').value.trim();
+            if (note && pendingNoteRange && !pendingNoteRange.collapsed) {
+                const span = document.createElement('span');
+                span.className = 'comment-highlight';
+                const tip = document.createElement('span');
+                tip.className = 'comment-tooltip';
+                tip.textContent = note;
+                span.appendChild(pendingNoteRange.extractContents());
+                span.appendChild(tip);
+                pendingNoteRange.insertNode(span);
+            }
+            window.cancelNote();
+        };
+
+        window.cancelNote = () => {
+            document.getElementById('noteModal').classList.add('hidden');
+            pendingNoteRange = null;
+            window.getSelection().removeAllRanges();
+        };
+
+        window.clearHighlight = () => {
+            if (contextMenu._targetEl) unwrapEl(contextMenu._targetEl);
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        window.clearAllHighlights = () => {
+            document.querySelectorAll('.highlight, .comment-highlight').forEach(unwrapEl);
+            closeContextMenu();
+            window.getSelection().removeAllRanges();
+        };
+
+        // ── MODAL CLOSE ──
+        window.closeResultsModal = () => {
+            document.getElementById('results-modal').classList.add('hidden');
+        };
+
+        // ── CLICK LISTENERS ON QUESTION CONTAINERS ──
+        document.querySelectorAll('.tf-question[data-q-start], .multi-choice-question[data-q-start]').forEach(el => {
+            el.addEventListener('click', e => {
+                e.stopPropagation();
+                const n = parseInt(el.dataset.qStart, 10);
+                if (!isNaN(n) && n !== currentQuestion) goToQuestion(n);
+            });
+        });
+
+        document.querySelectorAll('select.answer-input').forEach(sel => {
+            sel.addEventListener('change', () => sel.blur());
+        });
+
+        // ── EXPOSE GLOBALS ──
+        window.goToQuestion     = goToQuestion;
+        window.nextQuestion     = nextQuestion;
+        window.previousQuestion = previousQuestion;
+        window.closeResultsModal = window.closeResultsModal;
+
+        // ── INIT ──
+        goToQuestion(FIRST_Q);
+    });
+    </script>
+</body>
+</html>
