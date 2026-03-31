@@ -1,0 +1,156 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?   // For credentials provider
+  role          Role      @default(STUDENT)
+  currentBand   Float?    // IELTS current band score
+  targetBand    Float?    // IELTS target band score
+  tasksDone     Int       @default(0)
+  isActive      Boolean   @default(true)
+  isVerified    Boolean   @default(false)
+  isOnboarded   Boolean   @default(false)
+  country       String?
+  phone         String?
+  testType      String?   // Preferred test type (ACADEMIC/GT)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  testSubmissions TestSubmission[]
+  userProgress  UserProgress[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model TestSubmission {
+  id          String   @id @default(cuid())
+  userId      String
+  testId      String
+  testType    TestType
+  answers     Json     // Store answers as JSON
+  score       Float
+  bandScore   Float?   // IELTS band score equivalent
+  timeSpent   Int      // in seconds
+  submittedAt DateTime @default(now())
+  gradedAt    DateTime?
+  feedback    Json?    // AI feedback
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("test_submissions")
+}
+
+model UserProgress {
+  id            String   @id @default(cuid())
+  userId        String
+  testType      TestType
+  latestScore   Float
+  testsCompleted Int      @default(0)
+  lastTestDate  DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, testType])
+  @@map("user_progress")
+}
+
+model Test {
+  id          String   @id
+  title       String
+  type        TestType
+  duration    Int      // in minutes
+  description String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tests")
+}
+
+model Centre {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  address     String?
+  city        String?
+  country     String?
+  phone       String?
+  email       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("centres")
+}
+
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  type        String   @default("GENERAL") // GENERAL, URGENT, MAINTENANCE
+  isActive    Boolean  @default(true)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("announcements")
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+  CEO
+}
+
+enum TestType {
+  READING
+  LISTENING
+  WRITING
+  SPEAKING
+}
